@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Quiz</title>
+  <title>SSC Quiz</title>
   <style>
     body { font-family: Arial, sans-serif; background: #eef2f7; margin: 0; padding: 20px; }
     h1 { text-align: center; color: #2c3e50; }
@@ -109,7 +109,7 @@
     function checkAnswer(button, selected, solutionText) {
       const correct = questions[current].answer;
       const btns = document.querySelectorAll(".options button");
-      btns.forEach(b => b.disabled = true); // lock
+      btns.forEach(b => b.disabled = true);
       if (selected === correct) {
         score++;
         button.classList.add("correct");
@@ -150,17 +150,4 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       doc.setFontSize(14);
-      doc.text("SSC Quiz Report", 10, 10);
-      let y = 20;
-      answers.forEach((a, i) => {
-        doc.text(`Q${i+1}: ${a.q}`, 10, y); y+=6;
-        doc.text(`Your Answer: ${a.selected}`, 10, y); y+=6;
-        doc.text(`Correct Answer: ${a.correct}`, 10, y); y+=6;
-        doc.text(`Solution: ${a.solution}`, 10, y); y+=10;
-        if (y > 270) { doc.addPage(); y=20; }
-      });
-      doc.save("quiz-report.pdf");
-    }
-  </script>
-</body>
-</html>
+      doc.te
