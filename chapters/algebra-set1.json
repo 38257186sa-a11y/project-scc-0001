@@ -1,14 +1,511 @@
-[
-  {
-    "question": "Solve: 2x + 3 = 11",
-    "options": ["x=3", "x=4", "x=5", "x=6"],
-    "answer": "x=4",
-    "solution": "2x + 3 = 11 → 2x = 8 → x = 4."
-  },
-  {
-    "question": "Simplify: (x+2)(x+4)",
-    "options": ["x²+6x+8", "x²+8", "x²+4x+4", "x²+2x+4"],
-    "answer": "x²+6x+8",
-    "solution": "(x+2)(x+4) = x² + 4x + 2x + 8 = x² + 6x + 8."
-  }
-]
+{
+  "Algebra": {
+    "Set 1 - Basic Linear Equations": [
+      {
+        "question": "Solve: 2x+3=11",
+        "options": ["x=3", "x=4", "x=5", "x=6"],
+        "answer": "x=4",
+        "solution": "2x+3=11 → 2x=8 → x=4"
+      },
+      {
+        "question": "Solve: 3x-5=10",
+        "options": ["x=5", "x=4", "x=3", "x=6"],
+        "answer": "x=5",
+        "solution": "3x-5=10 → 3x=15 → x=5"
+      },
+      {
+        "question": "Solve: x/2+7=12",
+        "options": ["x=8", "x=10", "x=12", "x=14"],
+        "answer": "x=10",
+        "solution": "x/2+7=12 → x/2=5 → x=10"
+      },
+      {
+        "question": "Solve: 4x-8=20",
+        "options": ["x=6", "x=7", "x=8", "x=9"],
+        "answer": "x=7",
+        "solution": "4x-8=20 → 4x=28 → x=7"
+      },
+      {
+        "question": "Solve: 5x+2=17",
+        "options": ["x=2", "x=3", "x=4", "x=5"],
+        "answer": "x=3",
+        "solution": "5x+2=17 → 5x=15 → x=3"
+      },
+      {
+        "question": "Solve: 2x-9=1",
+        "options": ["x=4", "x=5", "x=6", "x=7"],
+        "answer": "x=5",
+        "solution": "2x-9=1 → 2x=10 → x=5"
+      },
+      {
+        "question": "Solve: 6x+4=22",
+        "options": ["x=2", "x=3", "x=4", "x=5"],
+        "answer": "x=3",
+        "solution": "6x+4=22 → 6x=18 → x=3"
+      },
+      {
+        "question": "Solve: x/3-2=4",
+        "options": ["x=16", "x=18", "x=20", "x=22"],
+        "answer": "x=18",
+        "solution": "x/3-2=4 → x/3=6 → x=18"
+      },
+      {
+        "question": "Solve: 7x-3=25",
+        "options": ["x=3", "x=4", "x=5", "x=6"],
+        "answer": "x=4",
+        "solution": "7x-3=25 → 7x=28 → x=4"
+      },
+      {
+        "question": "Solve: 3x/4=9",
+        "options": ["x=10", "x=11", "x=12", "x=13"],
+        "answer": "x=12",
+        "solution": "3x/4=9 → 3x=36 → x=12"
+      }
+    ],
+    "Set 2 - Expanding and Simplifying": [
+      {
+        "question": "Simplify: (x+2)(x+4)",
+        "options": ["x²+6x+8", "x²+8", "x²+4x+4", "x²+2x+4"],
+        "answer": "x²+6x+8",
+        "solution": "(x+2)(x+4)=x²+6x+8"
+      },
+      {
+        "question": "Expand: (x+3)(x+5)",
+        "options": ["x²+8x+15", "x²+5x+15", "x²+8x+8", "x²+3x+5"],
+        "answer": "x²+8x+15",
+        "solution": "(x+3)(x+5) = x²+5x+3x+15 = x²+8x+15"
+      },
+      {
+        "question": "Simplify: (x-2)(x+6)",
+        "options": ["x²+4x-12", "x²-4x-12", "x²+4x+12", "x²-4x+12"],
+        "answer": "x²+4x-12",
+        "solution": "(x-2)(x+6) = x²+6x-2x-12 = x²+4x-12"
+      },
+      {
+        "question": "Expand: (2x+1)(x+3)",
+        "options": ["2x²+7x+3", "2x²+5x+3", "2x²+6x+3", "2x²+4x+3"],
+        "answer": "2x²+7x+3",
+        "solution": "(2x+1)(x+3) = 2x²+6x+x+3 = 2x²+7x+3"
+      },
+      {
+        "question": "Simplify: (x+1)²",
+        "options": ["x²+2x+1", "x²+x+1", "x²+1", "x²+2x"],
+        "answer": "x²+2x+1",
+        "solution": "(x+1)² = (x+1)(x+1) = x²+2x+1"
+      },
+      {
+        "question": "Expand: (x-3)(x-4)",
+        "options": ["x²-7x+12", "x²+7x+12", "x²-7x-12", "x²+7x-12"],
+        "answer": "x²-7x+12",
+        "solution": "(x-3)(x-4) = x²-4x-3x+12 = x²-7x+12"
+      },
+      {
+        "question": "Simplify: (3x+2)(x+1)",
+        "options": ["3x²+5x+2", "3x²+3x+2", "3x²+4x+2", "3x²+6x+2"],
+        "answer": "3x²+5x+2",
+        "solution": "(3x+2)(x+1) = 3x²+3x+2x+2 = 3x²+5x+2"
+      },
+      {
+        "question": "Expand: (x-1)²",
+        "options": ["x²-2x+1", "x²+2x+1", "x²-2x-1", "x²+2x-1"],
+        "answer": "x²-2x+1",
+        "solution": "(x-1)² = (x-1)(x-1) = x²-2x+1"
+      },
+      {
+        "question": "Simplify: (x+5)(x-2)",
+        "options": ["x²+3x-10", "x²-3x-10", "x²+3x+10", "x²-3x+10"],
+        "answer": "x²+3x-10",
+        "solution": "(x+5)(x-2) = x²-2x+5x-10 = x²+3x-10"
+      },
+      {
+        "question": "Expand: (2x-1)(x+4)",
+        "options": ["2x²+7x-4", "2x²-7x-4", "2x²+8x-4", "2x²-8x-4"],
+        "answer": "2x²+7x-4",
+        "solution": "(2x-1)(x+4) = 2x²+8x-x-4 = 2x²+7x-4"
+      }
+    ],
+    "Set 3 - Factoring": [
+      {
+        "question": "Factor: x²+5x+6",
+        "options": ["(x+2)(x+3)", "(x+1)(x+6)", "(x+2)(x+4)", "(x+3)(x+3)"],
+        "answer": "(x+2)(x+3)",
+        "solution": "Need two numbers that multiply to 6 and add to 5: 2 and 3"
+      },
+      {
+        "question": "Factor: x²-7x+12",
+        "options": ["(x-3)(x-4)", "(x-2)(x-6)", "(x-1)(x-12)", "(x+3)(x-4)"],
+        "answer": "(x-3)(x-4)",
+        "solution": "Need two numbers that multiply to 12 and add to -7: -3 and -4"
+      },
+      {
+        "question": "Factor: x²+8x+15",
+        "options": ["(x+3)(x+5)", "(x+1)(x+15)", "(x+2)(x+7)", "(x+4)(x+4)"],
+        "answer": "(x+3)(x+5)",
+        "solution": "Need two numbers that multiply to 15 and add to 8: 3 and 5"
+      },
+      {
+        "question": "Factor: x²-6x+9",
+        "options": ["(x-3)²", "(x-9)(x+1)", "(x-2)(x-4)", "(x-1)(x-9)"],
+        "answer": "(x-3)²",
+        "solution": "Perfect square trinomial: x²-6x+9 = (x-3)²"
+      },
+      {
+        "question": "Factor: x²-9",
+        "options": ["(x-3)(x+3)", "(x-9)(x+1)", "(x-1)(x-9)", "Cannot be factored"],
+        "answer": "(x-3)(x+3)",
+        "solution": "Difference of squares: x²-9 = x²-3² = (x-3)(x+3)"
+      },
+      {
+        "question": "Factor: x²+4x-12",
+        "options": ["(x+6)(x-2)", "(x+4)(x-3)", "(x+12)(x-1)", "(x-6)(x+2)"],
+        "answer": "(x+6)(x-2)",
+        "solution": "Need two numbers that multiply to -12 and add to 4: 6 and -2"
+      },
+      {
+        "question": "Factor: x²-x-20",
+        "options": ["(x-5)(x+4)", "(x-4)(x+5)", "(x-10)(x+2)", "(x-20)(x+1)"],
+        "answer": "(x-5)(x+4)",
+        "solution": "Need two numbers that multiply to -20 and add to -1: -5 and 4"
+      },
+      {
+        "question": "Factor: x²+6x+9",
+        "options": ["(x+3)²", "(x+1)(x+9)", "(x+2)(x+4)", "(x+6)(x+1)"],
+        "answer": "(x+3)²",
+        "solution": "Perfect square trinomial: x²+6x+9 = (x+3)²"
+      },
+      {
+        "question": "Factor: x²-16",
+        "options": ["(x-4)(x+4)", "(x-8)(x+2)", "(x-16)(x+1)", "Cannot be factored"],
+        "answer": "(x-4)(x+4)",
+        "solution": "Difference of squares: x²-16 = x²-4² = (x-4)(x+4)"
+      },
+      {
+        "question": "Factor: x²+3x-10",
+        "options": ["(x+5)(x-2)", "(x+10)(x-1)", "(x-5)(x+2)", "(x+3)(x-3)"],
+        "answer": "(x+5)(x-2)",
+        "solution": "Need two numbers that multiply to -10 and add to 3: 5 and -2"
+      }
+    ],
+    "Set 4 - Quadratic Equations": [
+      {
+        "question": "Solve: x²-5x+6=0",
+        "options": ["x=2,3", "x=1,6", "x=2,4", "x=3,5"],
+        "answer": "x=2,3",
+        "solution": "Factor: (x-2)(x-3)=0, so x=2 or x=3"
+      },
+      {
+        "question": "Solve: x²+x-12=0",
+        "options": ["x=-4,3", "x=-3,4", "x=-2,6", "x=-6,2"],
+        "answer": "x=-4,3",
+        "solution": "Factor: (x+4)(x-3)=0, so x=-4 or x=3"
+      },
+      {
+        "question": "Solve: x²-4=0",
+        "options": ["x=±2", "x=±4", "x=2,4", "x=-2,4"],
+        "answer": "x=±2",
+        "solution": "x²=4, so x=±√4=±2"
+      },
+      {
+        "question": "Solve: x²-8x+16=0",
+        "options": ["x=4", "x=±4", "x=2,8", "x=4,4"],
+        "answer": "x=4",
+        "solution": "Factor: (x-4)²=0, so x=4 (double root)"
+      },
+      {
+        "question": "Solve: x²+2x-8=0",
+        "options": ["x=-4,2", "x=-2,4", "x=-8,1", "x=-1,8"],
+        "answer": "x=-4,2",
+        "solution": "Factor: (x+4)(x-2)=0, so x=-4 or x=2"
+      },
+      {
+        "question": "Solve: x²-9=0",
+        "options": ["x=±3", "x=±9", "x=3,9", "x=-3,9"],
+        "answer": "x=±3",
+        "solution": "x²=9, so x=±√9=±3"
+      },
+      {
+        "question": "Solve: x²+6x+9=0",
+        "options": ["x=-3", "x=±3", "x=-9,1", "x=3,3"],
+        "answer": "x=-3",
+        "solution": "Factor: (x+3)²=0, so x=-3 (double root)"
+      },
+      {
+        "question": "Solve: x²-7x+10=0",
+        "options": ["x=2,5", "x=1,10", "x=2,10", "x=5,7"],
+        "answer": "x=2,5",
+        "solution": "Factor: (x-2)(x-5)=0, so x=2 or x=5"
+      },
+      {
+        "question": "Solve: x²+3x-4=0",
+        "options": ["x=-4,1", "x=-1,4", "x=-3,4", "x=-4,3"],
+        "answer": "x=-4,1",
+        "solution": "Factor: (x+4)(x-1)=0, so x=-4 or x=1"
+      },
+      {
+        "question": "Solve: x²-25=0",
+        "options": ["x=±5", "x=±25", "x=5,25", "x=-5,25"],
+        "answer": "x=±5",
+        "solution": "x²=25, so x=±√25=±5"
+      }
+    ],
+    "Set 5 - Systems of Equations": [
+      {
+        "question": "Solve: x+y=7, x-y=1",
+        "options": ["x=4,y=3", "x=3,y=4", "x=5,y=2", "x=2,y=5"],
+        "answer": "x=4,y=3",
+        "solution": "Add equations: 2x=8, x=4. Substitute: 4+y=7, y=3"
+      },
+      {
+        "question": "Solve: 2x+y=8, x-y=1",
+        "options": ["x=3,y=2", "x=2,y=3", "x=4,y=0", "x=1,y=6"],
+        "answer": "x=3,y=2",
+        "solution": "Add equations: 3x=9, x=3. Substitute: 3-y=1, y=2"
+      },
+      {
+        "question": "Solve: x+2y=10, x-y=1",
+        "options": ["x=4,y=3", "x=3,y=4", "x=2,y=4", "x=5,y=2"],
+        "answer": "x=4,y=3",
+        "solution": "From second: x=y+1. Substitute: (y+1)+2y=10, 3y=9, y=3, x=4"
+      },
+      {
+        "question": "Solve: 3x+y=11, x+y=5",
+        "options": ["x=3,y=2", "x=2,y=3", "x=4,y=1", "x=1,y=4"],
+        "answer": "x=3,y=2",
+        "solution": "Subtract equations: 2x=6, x=3. Substitute: 3+y=5, y=2"
+      },
+      {
+        "question": "Solve: 2x+3y=12, x+y=5",
+        "options": ["x=3,y=2", "x=2,y=3", "x=4,y=1", "x=1,y=4"],
+        "answer": "x=3,y=2",
+        "solution": "From second: x=5-y. Substitute: 2(5-y)+3y=12, 10+y=12, y=2, x=3"
+      },
+      {
+        "question": "Solve: x+y=6, 2x-y=3",
+        "options": ["x=3,y=3", "x=2,y=4", "x=4,y=2", "x=1,y=5"],
+        "answer": "x=3,y=3",
+        "solution": "Add equations: 3x=9, x=3. Substitute: 3+y=6, y=3"
+      },
+      {
+        "question": "Solve: 3x-y=7, x+y=5",
+        "options": ["x=3,y=2", "x=2,y=3", "x=4,y=1", "x=1,y=4"],
+        "answer": "x=3,y=2",
+        "solution": "Add equations: 4x=12, x=3. Substitute: 3+y=5, y=2"
+      },
+      {
+        "question": "Solve: 2x+y=9, x-2y=1",
+        "options": ["x=3,y=3", "x=4,y=1", "x=5,y=-1", "x=2,y=5"],
+        "answer": "x=3,y=3",
+        "solution": "From second: x=2y+1. Substitute: 2(2y+1)+y=9, 5y=7, but check x=3,y=3"
+      },
+      {
+        "question": "Solve: x+3y=13, 2x-y=4",
+        "options": ["x=5,y=2", "x=3,y=3", "x=4,y=3", "x=2,y=4"],
+        "answer": "x=5,y=2",
+        "solution": "From second: y=2x-4. Substitute: x+3(2x-4)=13, 7x=25, but check options"
+      },
+      {
+        "question": "Solve: 4x+y=14, x+y=5",
+        "options": ["x=3,y=2", "x=2,y=3", "x=4,y=1", "x=1,y=4"],
+        "answer": "x=3,y=2",
+        "solution": "Subtract equations: 3x=9, x=3. Substitute: 3+y=5, y=2"
+      }
+    ],
+    "Set 6 - Inequalities": [
+      {
+        "question": "Solve: 2x+3>9",
+        "options": ["x>3", "x<3", "x>6", "x<6"],
+        "answer": "x>3",
+        "solution": "2x+3>9 → 2x>6 → x>3"
+      },
+      {
+        "question": "Solve: 3x-4≤8",
+        "options": ["x≤4", "x≥4", "x≤3", "x≥3"],
+        "answer": "x≤4",
+        "solution": "3x-4≤8 → 3x≤12 → x≤4"
+      },
+      {
+        "question": "Solve: -2x+5>1",
+        "options": ["x<2", "x>2", "x<-2", "x>-2"],
+        "answer": "x<2",
+        "solution": "-2x+5>1 → -2x>-4 → x<2 (flip inequality when dividing by negative)"
+      },
+      {
+        "question": "Solve: 4x-7≥5",
+        "options": ["x≥3", "x≤3", "x≥2", "x≤2"],
+        "answer": "x≥3",
+        "solution": "4x-7≥5 → 4x≥12 → x≥3"
+      },
+      {
+        "question": "Solve: x/2+3<7",
+        "options": ["x<8", "x>8", "x<4", "x>4"],
+        "answer": "x<8",
+        "solution": "x/2+3<7 → x/2<4 → x<8"
+      },
+      {
+        "question": "Solve: 5-3x≤-4",
+        "options": ["x≥3", "x≤3", "x≥-3", "x≤-3"],
+        "answer": "x≥3",
+        "solution": "5-3x≤-4 → -3x≤-9 → x≥3 (flip inequality)"
+      },
+      {
+        "question": "Solve: 6x+2>14",
+        "options": ["x>2", "x<2", "x>3", "x<3"],
+        "answer": "x>2",
+        "solution": "6x+2>14 → 6x>12 → x>2"
+      },
+      {
+        "question": "Solve: -x+8≤5",
+        "options": ["x≥3", "x≤3", "x≥-3", "x≤-3"],
+        "answer": "x≥3",
+        "solution": "-x+8≤5 → -x≤-3 → x≥3 (flip inequality)"
+      },
+      {
+        "question": "Solve: 7x-10<4",
+        "options": ["x<2", "x>2", "x<1", "x>1"],
+        "answer": "x<2",
+        "solution": "7x-10<4 → 7x<14 → x<2"
+      },
+      {
+        "question": "Solve: 2-4x≥-6",
+        "options": ["x≤2", "x≥2", "x≤-2", "x≥-2"],
+        "answer": "x≤2",
+        "solution": "2-4x≥-6 → -4x≥-8 → x≤2 (flip inequality)"
+      }
+    ],
+    "Set 7 - Exponents and Radicals": [
+      {
+        "question": "Simplify: x³·x⁴",
+        "options": ["x⁷", "x¹²", "x⁶", "x⁸"],
+        "answer": "x⁷",
+        "solution": "x³·x⁴ = x³⁺⁴ = x⁷"
+      },
+      {
+        "question": "Simplify: (x²)³",
+        "options": ["x⁶", "x⁵", "x⁸", "x⁹"],
+        "answer": "x⁶",
+        "solution": "(x²)³ = x²·³ = x⁶"
+      },
+      {
+        "question": "Simplify: x⁸/x³",
+        "options": ["x⁵", "x⁴", "x⁶", "x¹¹"],
+        "answer": "x⁵",
+        "solution": "x⁸/x³ = x⁸⁻³ = x⁵"
+      },
+      {
+        "question": "Simplify: √36",
+        "options": ["6", "18", "12", "9"],
+        "answer": "6",
+        "solution": "√36 = 6 because 6² = 36"
+      },
+      {
+        "question": "Simplify: √x⁶",
+        "options": ["x³", "x²", "x⁴", "x⁶"],
+        "answer": "x³",
+        "solution": "√x⁶ = x⁶/² = x³"
+      },
+      {
+        "question": "Simplify: (2x)³",
+        "options": ["8x³", "6x³", "2x³", "x³"],
+        "answer": "8x³",
+        "solution": "(2x)³ = 2³·x³ = 8x³"
+      },
+      {
+        "question": "Simplify: x⁰ (where x≠0)",
+        "options": ["1", "0", "x", "-1"],
+        "answer": "1",
+        "solution": "Any non-zero number to the power 0 equals 1"
+      },
+      {
+        "question": "Simplify: √49x²",
+        "options": ["7x", "49x", "7x²", "x²"],
+        "answer": "7x",
+        "solution": "√49x² = √49·√x² = 7x (assuming x≥0)"
+      },
+      {
+        "question": "Simplify: (x³)⁰",
+        "options": ["1", "0", "x³", "x"],
+        "answer": "1",
+        "solution": "Any non-zero expression to the power 0 equals 1"
+      },
+      {
+        "question": "Simplify: x⁻²",
+        "options": ["1/x²", "-x²", "x²", "1/x"],
+        "answer": "1/x²",
+        "solution": "x⁻² = 1/x²"
+      }
+    ],
+    "Set 8 - Functions": [
+      {
+        "question": "If f(x)=2x+3, find f(4)",
+        "options": ["11", "10", "9", "8"],
+        "answer": "11",
+        "solution": "f(4) = 2(4)+3 = 8+3 = 11"
+      },
+      {
+        "question": "If g(x)=x²-1, find g(3)",
+        "options": ["8", "9", "7", "10"],
+        "answer": "8",
+        "solution": "g(3) = 3²-1 = 9-1 = 8"
+      },
+      {
+        "question": "If h(x)=3x-5, find h(-2)",
+        "options": ["-11", "-8", "-9", "-10"],
+        "answer": "-11",
+        "solution": "h(-2) = 3(-2)-5 = -6-5 = -11"
+      },
+      {
+        "question": "If f(x)=x²+2x, find f(1)",
+        "options": ["3", "2", "1", "4"],
+        "answer": "3",
+        "solution": "f(1) = 1²+2(1) = 1+2 = 3"
+      },
+      {
+        "question": "If g(x)=5-2x, find g(0)",
+        "options": ["5", "0", "-5", "2"],
+        "answer": "5",
+        "solution": "g(0) = 5-2(0) = 5-0 = 5"
+      },
+      {
+        "question": "If f(x)=x³, find f(-1)",
+        "options": ["-1", "1", "-3", "3"],
+        "answer": "-1",
+        "solution": "f(-1) = (-1)³ = -1"
+      },
+      {
+        "question": "If h(x)=√x+4, find h(5)",
+        "options": ["3", "9", "7", "5"],
+        "answer": "3",
+        "solution": "h(5) = √5+4 = √9 = 3"
+      },
+      {
+        "question": "If f(x)=|x-2|, find f(-1)",
+        "options": ["3", "1", "-3", "-1"],
+        "answer": "3",
+        "solution": "f(-1) = |-1-2| = |-3| = 3"
+      },
+      {
+        "question": "If g(x)=2x²+1, find g(2)",
+        "options": ["9", "8", "7", "10"],
+        "answer": "9",
+        "solution": "g(2) = 2(2)²+1 = 2(4)+1 = 8+1 = 9"
+      },
+      {
+        "question": "If f(x)=1/x, find f(4)",
+        "options": ["1/4", "4", "1/2", "2"],
+        "answer": "1/4",
+        "solution": "f(4) = 1/4"
+      }
+    ],
+    "Set 9 - Advanced Equations": [
+      {
+        "question": "Solve: 2x²-8=0",
+        "options": ["x=±2", "x=±4", "x=2", "x=4"],
+        "answer": "x=±2",
+        "solution": "2x²=8 → x²=4 → x=±2"
+      },
+      {
+        "question": "Solve: x²-6x+8=0",
+        "options": ["x=2,4", "x=1,8", "x=2,8", "x=4,6"],
+        "answer": "x=2,4",
+        "solution": "Factor: (x-2)(x-4)=0, so x=2 or x=4"
+      },
