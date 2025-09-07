@@ -1,182 +1,962 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SSC Maths Quiz - JSON Based</title>
-<style>
-body { font-family: Arial, sans-serif; background: #f4f6fb; margin:0; padding:20px; }
-header { background:#2c3e50; color:white; text-align:center; padding:25px 0; }
-h1,h2 { margin:0 0 10px 0; }
-.container { max-width:1000px; margin:20px auto; background:white; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
-.chapter-grid { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
-.chapter-btn, .set-btn { padding:15px 25px; border-radius:10px; border:none; background:#27ae60; color:white; font-size:16px; cursor:pointer; transition:all 0.3s; }
-.chapter-btn:hover, .set-btn:hover { background:#1e8449; transform:scale(1.05); }
-.question { font-size:18px; margin-bottom:15px; }
-.options button { display:block; width:100%; margin:8px 0; padding:10px; border:none; border-radius:8px; background:#ecf0f1; cursor:pointer; transition:0.3s; }
-.options button.correct { background:#2ecc71; color:white; }
-.options button.wrong { background:#e74c3c; color:white; }
-.solution { margin-top:10px; padding:10px; background:#f9f9f9; border-left:4px solid #3498db; display:none; }
-.timer { font-weight:bold; color:#e74c3c; text-align:right; }
-.controls { margin-top:20px; text-align:center; }
-.controls button { margin:5px; padding:10px 20px; border:none; border-radius:8px; background:#3498db; color:white; cursor:pointer; }
-.score { text-align:center; margin-top:15px; font-weight:bold; }
-.report-item { margin-bottom:15px; padding:10px; border-radius:6px; background:#f6f6f6; }
-.correct-answer { color:green; font-weight:bold; }
-.wrong-answer { color:red; font-weight:bold; }
-.scratchpad { margin-top:10px; width:100%; height:100px; resize:vertical; font-size:16px; padding:8px; border-radius:6px; border:1px solid #ccc; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SSC Maths Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #eef2f7; margin: 0; padding: 20px; }
+    h1 { text-align: center; color: #2c3e50; }
+    .chapter-list, .set-list { text-align: center; margin: 20px 0; }
+    .btn {
+      display: inline-block; margin: 8px; padding: 12px 25px;
+      border: none; border-radius: 8px;
+      background: #27ae60; color: white; font-size: 16px;
+      cursor: pointer; text-decoration: none; transition: background 0.3s;
+    }
+    .btn:hover { background: #1e8449; }
+    .quiz-container {
+      max-width: 750px; margin: auto; background: white;
+      padding: 20px; border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1); display:none;
+    }
+    .question { font-size: 18px; margin-bottom: 15px; }
+    .options button {
+      display: block; width: 100%; margin: 8px 0; padding: 10px;
+      border: none; border-radius: 8px; background: #ecf0f1;
+      cursor: pointer; transition: background 0.3s;
+    }
+    .options button.correct { background: #2ecc71; color: white; }
+    .options button.wrong { background: #e74c3c; color: white; }
+    .solution { margin-top: 10px; padding: 10px; background: #f9f9f9; border-left: 4px solid #3498db; display: none; }
+    .timer { font-weight: bold; color: #e74c3c; text-align: right; }
+    .controls { margin-top: 20px; text-align: center; }
+    .controls button {
+      margin: 5px; padding: 10px 20px; border: none; border-radius: 8px;
+      background: #3498db; color: white; cursor: pointer;
+    }
+    .score { text-align: center; margin-top: 15px; font-weight: bold; }
+    .report-item { margin-bottom: 15px; padding: 10px; border-radius: 6px; background: #f6f6f6; }
+    .correct-answer { color: green; font-weight: bold; }
+    .wrong-answer { color: red; font-weight: bold; }
+  </style>
 </head>
 <body>
+  <h1>SSC Maths Quiz</h1>
 
-<header>
-<h1>SSC Maths Quiz</h1>
-<p>All chapters dynamically loaded from JSON</p>
-</header>
+  <!-- Chapter selection -->
+  <div class="chapter-list" id="chapter-list">
+    <h2>Select a Chapter</h2>
+    <button class="btn" onclick="showSets('Algebra')">Algebra</button>
+    <button class="btn" onclick="showSets('Geometry')">Geometry</button>
+    <button class="btn" onclick="showSets('Trigonometry')">Trigonometry</button>
+    <button class="btn" onclick="showSets('Arithmetic')">Arithmetic</button>
+    <button class="btn" onclick="showSets('Mensuration')">Mensuration</button>
+    <button class="btn" onclick="showSets('Statistics')">Statistics</button>
+  </div>
 
-<div class="container" id="chapter-container">
-<h2>Select a Chapter</h2>
-<div class="chapter-grid" id="chapters"></div>
-</div>
+  <!-- Set selection -->
+  <div class="set-list" id="set-list" style="display:none;">
+    <h2 id="set-title">Select a Set</h2>
+    <div id="sets"></div>
+    <button class="btn" onclick="backToChapters()">⬅ Back</button>
+  </div>
 
-<div class="container" id="set-container" style="display:none;">
-<h2 id="set-title">Select a Set</h2>
-<div id="sets"></div>
-<button class="set-btn" onclick="backToChapters()">⬅ Back to Chapters</button>
-</div>
+  <!-- Quiz -->
+  <div class="quiz-container" id="quiz-container">
+    <div class="timer" id="timer">⏳ Time: 30s</div>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="solution" id="solution"></div>
+    <div class="controls">
+      <button onclick="submitQuiz()">Submit Quiz</button>
+    </div>
+    <div class="score" id="score"></div>
+  </div>
 
-<div class="container" id="quiz-container" style="display:none;">
-<div class="timer" id="timer">⏳ Time: 2:00</div>
-<div class="question" id="question"></div>
-<div class="options" id="options"></div>
-<textarea class="scratchpad" placeholder="Use this area for calculations..."></textarea>
-<div class="solution" id="solution"></div>
-<div class="controls">
-<button onclick="submitQuiz()">Submit Quiz</button>
-</div>
-<div class="score" id="score"></div>
-</div>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    // 📚 Question Bank
+    const questionBank = {
+  "Algebra": {
+    "Set 1": [
+      { question: "Solve: 2x + 3 = 11",
+        options: ["x=3", "x=4", "x=5", "x=6"],
+        answer: "x=4",
+        solution: "Formula: Solve linear equations → 2x+3=11 → 2x=8 → x=4" },
+      { question: "Solve: 3x - 5 = 10",
+        options: ["x=5", "x=4", "x=3", "x=6"],
+        answer: "x=5",
+        solution: "Formula: Solve linear equations → 3x-5=10 → 3x=15 → x=5" },
+      { question: "Solve: x/2 + 7 = 12",
+        options: ["x=8", "x=10", "x=12", "x=14"],
+        answer: "x=10",
+        solution: "Formula: Solve linear equations → x/2+7=12 → x/2=5 → x=10" },
+      { question: "Solve: 4x - 8 = 20",
+        options: ["x=6", "x=7", "x=8", "x=9"],
+        answer: "x=7",
+        solution: "Formula: Solve linear equations → 4x-8=20 → 4x=28 → x=7" },
+      { question: "Solve: 5x + 2 = 17",
+        options: ["x=2", "x=3", "x=4", "x=5"],
+        answer: "x=3",
+        solution: "Formula: Solve linear equations → 5x+2=17 → 5x=15 → x=3" },
+      { question: "Solve: 6x - 9 = 15",
+        options: ["x=2", "x=3", "x=4", "x=5"],
+        answer: "x=4",
+        solution: "Formula: Solve linear equations → 6x-9=15 → 6x=24 → x=4" },
+      { question: "Solve: x/3 + 4 = 9",
+        options: ["x=12", "x=15", "x=18", "x=21"],
+        answer: "x=15",
+        solution: "Formula: Solve linear equations → x/3+4=9 → x/3=5 → x=15" },
+      { question: "Solve: 7x + 1 = 22",
+        options: ["x=2", "x=3", "x=4", "x=5"],
+        answer: "x=3",
+        solution: "Formula: Solve linear equations → 7x+1=22 → 7x=21 → x=3" },
+      { question: "Solve: 8x - 12 = 28",
+        options: ["x=4", "x=5", "x=6", "x=7"],
+        answer: "x=5",
+        solution: "Formula: Solve linear equations → 8x-12=28 → 8x=40 → x=5" },
+      { question: "Solve: x/4 + 3 = 8",
+        options: ["x=16", "x=18", "x=20", "x=24"],
+        answer: "x=20",
+        solution: "Formula: Solve linear equations → x/4+3=8 → x/4=5 → x=20" }
+    ],
+    "Set 2": [
+      { question: "Expand: (x+2)(x+4)",
+        options: ["x²+6x+8", "x²+8", "x²+4x+4", "x²+2x+4"],
+        answer: "x²+6x+8",
+        solution: "Formula: Expand binomials using FOIL → (x+2)(x+4) = x²+4x+2x+8 = x²+6x+8" },
+      { question: "Expand: (x+3)(x+5)",
+        options: ["x²+8x+15", "x²+5x+15", "x²+8x+8", "x²+3x+5"],
+        answer: "x²+8x+15",
+        solution: "Formula: Expand binomials using FOIL → (x+3)(x+5) = x²+5x+3x+15 = x²+8x+15" },
+      { question: "Simplify: (x-2)(x+6)",
+        options: ["x²+4x-12", "x²-4x-12", "x²+4x+12", "x²-4x+12"],
+        answer: "x²+4x-12",
+        solution: "Formula: Expand binomials using FOIL → (x-2)(x+6) = x²+6x-2x-12 = x²+4x-12" },
+      { question: "Expand: (2x+1)(x+3)",
+        options: ["2x²+7x+3", "2x²+5x+3", "2x²+6x+3", "2x²+4x+3"],
+        answer: "2x²+7x+3",
+        solution: "Formula: Expand binomials using FOIL → (2x+1)(x+3) = 2x²+6x+x+3 = 2x²+7x+3" },
+      { question: "Simplify: (x+1)²",
+        options: ["x²+2x+1", "x²+x+1", "x²+1", "x²+2x"],
+        answer: "x²+2x+1",
+        solution: "Formula: Perfect square trinomial → (x+1)² = x²+2(1)(x)+1² = x²+2x+1" },
+      { question: "Expand: (x-3)(x-4)",
+        options: ["x²-7x+12", "x²+7x+12", "x²-7x-12", "x²+7x-12"],
+        answer: "x²-7x+12",
+        solution: "Formula: Expand binomials using FOIL → (x-3)(x-4) = x²-4x-3x+12 = x²-7x+12" },
+      { question: "Simplify: (x-2)²",
+        options: ["x²-4x+4", "x²+4x+4", "x²-4x-4", "x²-2x+4"],
+        answer: "x²-4x+4",
+        solution: "Formula: Perfect square trinomial → (x-2)² = x²-2(2)(x)+2² = x²-4x+4" },
+      { question: "Expand: (3x+2)(x+1)",
+        options: ["3x²+5x+2", "3x²+3x+2", "3x²+4x+2", "3x²+6x+2"],
+        answer: "3x²+5x+2",
+        solution: "Formula: Expand binomials using FOIL → (3x+2)(x+1) = 3x²+3x+2x+2 = 3x²+5x+2" },
+      { question: "Expand: (x+4)(x-1)",
+        options: ["x²+3x-4", "x²-3x-4", "x²+3x+4", "x²-3x+4"],
+        answer: "x²+3x-4",
+        solution: "Formula: Expand binomials using FOIL → (x+4)(x-1) = x²-x+4x-4 = x²+3x-4" },
+      { question: "Simplify: (2x+3)²",
+        options: ["4x²+12x+9", "4x²+6x+9", "4x²+12x+6", "4x²+9x+9"],
+        answer: "4x²+12x+9",
+        solution: "Formula: Perfect square trinomial → (2x+3)² = (2x)²+2(2x)(3)+3² = 4x²+12x+9" }
+    ],
+    "Set 3": [
+      { question: "Factor: x²+5x+6",
+        options: ["(x+2)(x+3)", "(x+1)(x+6)", "(x-2)(x-3)", "(x+5)(x+1)"],
+        answer: "(x+2)(x+3)",
+        solution: "Formula: Factor quadratics → Find two numbers that multiply to 6 and add to 5 → 2 and 3 → (x+2)(x+3)" },
+      { question: "Factor: x²-7x+12",
+        options: ["(x-3)(x-4)", "(x+3)(x+4)", "(x-2)(x-6)", "(x+1)(x-12)"],
+        answer: "(x-3)(x-4)",
+        solution: "Formula: Factor quadratics → Find two numbers that multiply to 12 and add to -7 → -3 and -4 → (x-3)(x-4)" },
+      { question: "Factor: x²-9",
+        options: ["(x-3)(x+3)", "(x-9)(x+1)", "(x-1)(x+9)", "Cannot be factored"],
+        answer: "(x-3)(x+3)",
+        solution: "Formula: Difference of squares → a²-b² = (a-b)(a+b) → x²-9 = x²-3² = (x-3)(x+3)" },
+      { question: "Factor: x²+8x+16",
+        options: ["(x+4)²", "(x+2)(x+8)", "(x+1)(x+16)", "(x-4)²"],
+        answer: "(x+4)²",
+        solution: "Formula: Perfect square trinomial → a²+2ab+b² = (a+b)² → x²+8x+16 = (x+4)²" },
+      { question: "Factor: 2x²+8x",
+        options: ["2x(x+4)", "x(2x+8)", "2(x²+4x)", "Cannot be factored"],
+        answer: "2x(x+4)",
+        solution: "Formula: Factor out GCF → GCF of 2x² and 8x is 2x → 2x²+8x = 2x(x+4)" },
+      { question: "Factor: x²-25",
+        options: ["(x-5)(x+5)", "(x-25)(x+1)", "(x-1)(x+25)", "Cannot be factored"],
+        answer: "(x-5)(x+5)",
+        solution: "Formula: Difference of squares → a²-b² = (a-b)(a+b) → x²-25 = x²-5² = (x-5)(x+5)" },
+      { question: "Factor: x²+6x+9",
+        options: ["(x+3)²", "(x+1)(x+9)", "(x+2)(x+4.5)", "(x-3)²"],
+        answer: "(x+3)²",
+        solution: "Formula: Perfect square trinomial → a²+2ab+b² = (a+b)² → x²+6x+9 = (x+3)²" },
+      { question: "Factor: x²-4x-12",
+        options: ["(x-6)(x+2)", "(x+6)(x-2)", "(x-4)(x+3)", "(x+4)(x-3)"],
+        answer: "(x-6)(x+2)",
+        solution: "Formula: Factor quadratics → Find two numbers that multiply to -12 and add to -4 → -6 and 2 → (x-6)(x+2)" },
+      { question: "Factor: x²+10x+25",
+        options: ["(x+5)²", "(x+10)(x+25)", "(x+1)(x+25)", "(x-5)²"],
+        answer: "(x+5)²",
+        solution: "Formula: Perfect square trinomial → a²+2ab+b² = (a+b)² → x²+10x+25 = (x+5)²" },
+      { question: "Factor: x²-16",
+        options: ["(x-4)(x+4)", "(x-16)(x+1)", "(x-1)(x+16)", "Cannot be factored"],
+        answer: "(x-4)(x+4)",
+        solution: "Formula: Difference of squares → a²-b² = (a-b)(a+b) → x²-16 = x²-4² = (x-4)(x+4)" }
+    ],
+    "Set 4": [
+      { question: "Solve the system: x+y=5, x-y=1",
+        options: ["x=3,y=2", "x=2,y=3", "x=4,y=1", "x=1,y=4"],
+        answer: "x=3,y=2",
+        solution: "Formula: Elimination method → Add equations: 2x=6 → x=3 → Substitute: 3+y=5 → y=2" },
+      { question: "Solve the system: 2x+y=8, x-y=1",
+        options: ["x=3,y=2", "x=2,y=4", "x=4,y=0", "x=1,y=6"],
+        answer: "x=3,y=2",
+        solution: "Formula: Elimination method → Add equations: 3x=9 → x=3 → Substitute: 3-y=1 → y=2" },
+      { question: "Solve the system: x+2y=7, x-2y=1",
+        options: ["x=4,y=1.5", "x=3,y=2", "x=2,y=2.5", "x=5,y=1"],
+        answer: "x=4,y=1.5",
+        solution: "Formula: Elimination method → Add equations: 2x=8 → x=4 → Substitute: 4+2y=7 → y=1.5" },
+      { question: "Solve the system: 3x+y=10, x+y=4",
+        options: ["x=3,y=1", "x=2,y=2", "x=4,y=0", "x=1,y=3"],
+        answer: "x=3,y=1",
+        solution: "Formula: Elimination method → Subtract equations: 2x=6 → x=3 → Substitute: 3+y=4 → y=1" },
+      { question: "Solve the system: 2x-y=3, x+y=6",
+        options: ["x=3,y=3", "x=4,y=2", "x=2,y=4", "x=5,y=1"],
+        answer: "x=3,y=3",
+        solution: "Formula: Elimination method → Add equations: 3x=9 → x=3 → Substitute: 3+y=6 → y=3" },
+      { question: "Solve the system: x+3y=11, 2x-y=3",
+        options: ["x=2,y=3", "x=3,y=2", "x=4,y=1", "x=1,y=4"],
+        answer: "x=2,y=3",
+        solution: "Formula: Substitution method → From second equation: y=2x-3 → Substitute: x+3(2x-3)=11 → x+6x-9=11 → 7x=20 → x=2, y=3" },
+      { question: "Solve the system: 4x+2y=12, x-y=0",
+        options: ["x=2,y=2", "x=3,y=3", "x=1,y=1", "x=4,y=4"],
+        answer: "x=2,y=2",
+        solution: "Formula: Substitution method → From second equation: x=y → Substitute: 4y+2y=12 → 6y=12 → y=2, x=2" },
+      { question: "Solve the system: x+y=6, 2x+3y=16",
+        options: ["x=2,y=4", "x=4,y=2", "x=3,y=3", "x=1,y=5"],
+        answer: "x=2,y=4",
+        solution: "Formula: Substitution method → From first equation: x=6-y → Substitute: 2(6-y)+3y=16 → 12-2y+3y=16 → y=4, x=2" },
+      { question: "Solve the system: 3x-2y=4, x+2y=8",
+        options: ["x=3,y=2.5", "x=2,y=3", "x=4,y=2", "x=1,y=3.5"],
+        answer: "x=3,y=2.5",
+        solution: "Formula: Elimination method → Add equations: 4x=12 → x=3 → Substitute: 3+2y=8 → y=2.5" },
+      { question: "Solve the system: 2x+4y=14, x-2y=1",
+        options: ["x=3,y=2", "x=4,y=1.5", "x=5,y=1", "x=2,y=2.5"],
+        answer: "x=3,y=2",
+        solution: "Formula: Substitution method → From second equation: x=1+2y → Substitute: 2(1+2y)+4y=14 → 2+4y+4y=14 → 8y=12 → y=2, x=3" }
+    ],
+    "Set 5": [
+      { question: "Solve: 2x+3>11",
+        options: ["x>4", "x<4", "x>7", "x<7"],
+        answer: "x>4",
+        solution: "Formula: Solve linear inequalities → 2x+3>11 → 2x>8 → x>4" },
+      { question: "Solve: 3x-5≤10",
+        options: ["x≤5", "x≥5", "x≤15", "x≥15"],
+        answer: "x≤5",
+        solution: "Formula: Solve linear inequalities → 3x-5≤10 → 3x≤15 → x≤5" },
+      { question: "Solve: -2x+4<8",
+        options: ["x>-2", "x<-2", "x>2", "x<2"],
+        answer: "x>-2",
+        solution: "Formula: Solve linear inequalities → -2x+4<8 → -2x<4 → x>-2 (flip inequality when dividing by negative)" },
+      { question: "Solve: 5x+1≥16",
+        options: ["x≥3", "x≤3", "x≥17", "x≤17"],
+        answer: "x≥3",
+        solution: "Formula: Solve linear inequalities → 5x+1≥16 → 5x≥15 → x≥3" },
+      { question: "Solve: -x+7>3",
+        options: ["x<4", "x>4", "x<-4", "x>-4"],
+        answer: "x<4",
+        solution: "Formula: Solve linear inequalities → -x+7>3 → -x>-4 → x<4 (flip inequality when dividing by negative)" },
+      { question: "Solve: 4x-2≤14",
+        options: ["x≤4", "x≥4", "x≤16", "x≥16"],
+        answer: "x≤4",
+        solution: "Formula: Solve linear inequalities → 4x-2≤14 → 4x≤16 → x≤4" },
+      { question: "Solve: 6x+5>17",
+        options: ["x>2", "x<2", "x>22", "x<22"],
+        answer: "x>2",
+        solution: "Formula: Solve linear inequalities → 6x+5>17 → 6x>12 → x>2" },
+      { question: "Solve: -3x-1<8",
+        options: ["x>-3", "x<-3", "x>3", "x<3"],
+        answer: "x>-3",
+        solution: "Formula: Solve linear inequalities → -3x-1<8 → -3x<9 → x>-3 (flip inequality when dividing by negative)" },
+      { question: "Solve: 7x-3≥18",
+        options: ["x≥3", "x≤3", "x≥21", "x≤21"],
+        answer: "x≥3",
+        solution: "Formula: Solve linear inequalities → 7x-3≥18 → 7x≥21 → x≥3" },
+      { question: "Solve: -4x+6≤-2",
+        options: ["x≥2", "x≤2", "x≥-2", "x≤-2"],
+        answer: "x≥2",
+        solution: "Formula: Solve linear inequalities → -4x+6≤-2 → -4x≤-8 → x≥2 (flip inequality when dividing by negative)" }
+    ],
+    "Set 6": [
+      { question: "Solve: x²-5x+6=0",
+        options: ["x=2,3", "x=1,6", "x=-2,-3", "x=5,1"],
+        answer: "x=2,3",
+        solution: "Formula: Factor quadratic → x²-5x+6=(x-2)(x-3)=0 → x=2 or x=3" },
+      { question: "Solve: x²+7x+12=0",
+        options: ["x=-3,-4", "x=3,4", "x=-2,-6", "x=2,6"],
+        answer: "x=-3,-4",
+        solution: "Formula: Factor quadratic → x²+7x+12=(x+3)(x+4)=0 → x=-3 or x=-4" },
+      { question: "Solve: x²-9=0",
+        options: ["x=±3", "x=±9", "x=3", "x=9"],
+        answer: "x=±3",
+        solution: "Formula: Difference of squares → x²-9=0 → x²=9 → x=±3" },
+      { question: "Solve: x²+4x+4=0",
+        options: ["x=-2", "x=2", "x=±2", "x=-4"],
+        answer: "x=-2",
+        solution: "Formula: Perfect square → x²+4x+4=(x+2)²=0 → x=-2 (double root)" },
+      { question: "Solve using the quadratic formula: x²+3x-4=0",
+        options: ["x=1,-4", "x=-1,4", "x=2,-2", "x=3,-1"],
+        answer: "x=1,-4",
+        solution: "Formula: Quadratic formula → x=(-3±√(9+16))/2=(-3±5)/2 → x=1 or x=-4" },
+      { question: "Solve: x²-6x+9=0",
+        options: ["x=3", "x=-3", "x=±3", "x=6"],
+        answer: "x=3",
+        solution: "Formula: Perfect square → x²-6x+9=(x-3)²=0 → x=3 (double root)" },
+      { question: "Solve: x²-8x+15=0",
+        options: ["x=3,5", "x=-3,-5", "x=1,15", "x=8,1"],
+        answer: "x=3,5",
+        solution: "Formula: Factor quadratic → x²-8x+15=(x-3)(x-5)=0 → x=3 or x=5" },
+      { question: "Solve: x²-16=0",
+        options: ["x=±4", "x=±16", "x=4", "x=16"],
+        answer: "x=±4",
+        solution: "Formula: Difference of squares → x²-16=0 → x²=16 → x=±4" },
+      { question: "Solve: x²+6x+8=0",
+        options: ["x=-2,-4", "x=2,4", "x=-1,-8", "x=1,8"],
+        answer: "x=-2,-4",
+        solution: "Formula: Factor quadratic → x²+6x+8=(x+2)(x+4)=0 → x=-2 or x=-4" },
+      { question: "Solve: x²-10x+25=0",
+        options: ["x=5", "x=-5", "x=±5", "x=10"],
+        answer: "x=5",
+        solution: "Formula: Perfect square → x²-10x+25=(x-5)²=0 → x=5 (double root)" }
+  ]
+},
+"Geometry": {
+        "Set 1": [
+          { question: "Find area of a triangle with base=6, height=4",
+            options: ["12", "10", "14", "8"],
+            answer: "12",
+            solution: "Formula: Area = ½ × base × height = ½ × 6 × 4 = 12" },
+          { question: "Find area of a circle with radius=7",
+            options: ["154", "44", "49π", "14π"],
+            answer: "154",
+            solution: "Formula: Area = πr² = π × 7² = 49π ≈ 154" },
+          { question: "Perimeter of a rectangle with length=8, width=5",
+            options: ["26", "40", "13", "30"],
+            answer: "26",
+            solution: "Formula: Perimeter = 2(l + w) = 2(8 + 5) = 2 × 13 = 26" },
+          { question: "Area of a square with side=9",
+            options: ["81", "36", "18", "45"],
+            answer: "81",
+            solution: "Formula: Area = side² = 9² = 81" },
+          { question: "Circumference of a circle with radius=5",
+            options: ["31.4", "25", "15.7", "10π"],
+            answer: "31.4",
+            solution: "Formula: Circumference = 2πr = 2π × 5 = 10π ≈ 31.4" }
+        ]
+      },
+      "Trigonometry": {
+        "Set 1": [
+          { question: "Value of sin²30° + cos²30°?",
+        options: ["1", "0", "½", "√3/2"],
+        answer: "1",
+        solution: "Formula: sin²θ + cos²θ = 1 (Fundamental Identity)" },
+          { question: "Value of sin(60°)?",
+        options: ["√3/2", "1/2", "√2/2", "1"],
+        answer: "√3/2",
+        solution: "Formula: sin(60°) = √3/2 (Standard angle)" },
+          { question: "Value of cos(45°)?",
+        options: ["√2/2", "1/2", "√3/2", "1"],
+        answer: "√2/2",
+        solution: "Formula: cos(45°) = √2/2 = 1/√2 (Standard angle)" },
+          { question: "Value of tan(30°)?",
+        options: ["1/√3", "√3", "1", "√2"],
+        answer: "1/√3",
+        solution: "Formula: tan(30°) = 1/√3 = √3/3 (Standard angle)" },
+          { question: "If sin(θ) = 3/5, find cos(θ)",
+        options: ["4/5", "3/4", "5/4", "5/3"],
+        answer: "4/5",
+        solution: "Formula: sin²θ + cos²θ = 1 → cos²θ = 1 - (3/5)² = 1 - 9/25 = 16/25 → cos θ = 4/5" }
+        ],
+        "Set 2": [
+          { question: "Value of sin(0°)?",
+        options: ["0", "1", "1/2", "√3/2"],
+        answer: "0",
+        solution: "Formula: sin(0°) = 0 (Standard angle)" },
+          { question: "Value of cos(0°)?",
+        options: ["1", "0", "1/2", "√3/2"],
+        answer: "1",
+        solution: "Formula: cos(0°) = 1 (Standard angle)" },
+          { question: "Value of tan(45°)?",
+        options: ["1", "0", "√3", "1/√3"],
+        answer: "1",
+        solution: "Formula: tan(45°) = 1 (Standard angle)" },
+          { question: "Value of sin(90°)?",
+        options: ["1", "0", "1/2", "√3/2"],
+        answer: "1",
+        solution: "Formula: sin(90°) = 1 (Standard angle)" },
+          { question: "Value of cos(90°)?",
+        options: ["0", "1", "1/2", "√3/2"],
+        answer: "0",
+        solution: "Formula: cos(90°) = 0 (Standard angle)" },
+          { question: "Value of tan(0°)?",
+        options: ["0", "1", "undefined", "∞"],
+        answer: "0",
+        solution: "Formula: tan(0°) = 0 (Standard angle)" },
+          { question: "Value of tan(90°)?",
+        options: ["undefined", "0", "1", "∞"],
+        answer: "undefined",
+        solution: "Formula: tan(90°) is undefined (division by zero)" },
+          { question: "If cos(θ) = 5/13, find sin(θ) (θ in 1st quadrant)",
+        options: ["12/13", "5/12", "13/5", "13/12"],
+        answer: "12/13",
+        solution: "Formula: sin²θ + cos²θ = 1 → sin²θ = 1 - (5/13)² = 1 - 25/169 = 144/169 → sin θ = 12/13" },
+          { question: "If tan(θ) = 3/4, find sin(θ)",
+        options: ["3/5", "4/5", "5/3", "5/4"],
+        answer: "3/5",
+        solution: "tan θ = 3/4, so opposite=3, adjacent=4, hypotenuse=5 → sin θ = 3/5" },
+          { question: "If sin(θ) = 8/17, find cos(θ) (θ in 1st quadrant)",
+        options: ["15/17", "8/15", "17/8", "17/15"],
+        answer: "15/17",
+        solution: "sin²θ + cos²θ = 1 → cos²θ = 1 - (8/17)² = 1 - 64/289 = 225/289 → cos θ = 15/17" }
+        ],
+        "Set 3": [
+          { question: "sin(90° - θ) = ?",
+        options: ["cos(θ)", "sin(θ)", "tan(θ)", "cot(θ)"],
+        answer: "cos(θ)",
+        solution: "Formula: sin(90° - θ) = cos(θ) (co-function identity)" },
+          { question: "cos(90° - θ) = ?",
+        options: ["sin(θ)", "cos(θ)", "tan(θ)", "cot(θ)"],
+        answer: "sin(θ)",
+        solution: "Formula: cos(90° - θ) = sin(θ) (co-function identity)" },
+          { question: "tan(90° - θ) = ?",
+        options: ["cot(θ)", "tan(θ)", "sin(θ)", "cos(θ)"],
+        answer: "cot(θ)",
+        solution: "Formula: tan(90° - θ) = cot(θ) (co-function identity)" },
+          { question: "cot(90° - θ) = ?",
+        options: ["tan(θ)", "cot(θ)", "sin(θ)", "cos(θ)"],
+        answer: "tan(θ)",
+        solution: "Formula: cot(90° - θ) = tan(θ) (co-function identity)" },
+          { question: "sec(90° - θ) = ?",
+        options: ["cosec(θ)", "sec(θ)", "tan(θ)", "cot(θ)"],
+        answer: "cosec(θ)",
+        solution: "Formula: sec(90° - θ) = cosec(θ) (co-function identity)" },
+          { question: "cosec(90° - θ) = ?",
+        options: ["sec(θ)", "cosec(θ)", "tan(θ)", "cot(θ)"],
+        answer: "sec(θ)",
+        solution: "Formula: cosec(90° - θ) = sec(θ) (co-function identity)" },
+          { question: "sin(180° - θ) = ?",
+        options: ["sin(θ)", "-sin(θ)", "cos(θ)", "-cos(θ)"],
+        answer: "sin(θ)",
+        solution: "Formula: sin(180° - θ) = sin(θ)" },
+          { question: "cos(180° - θ) = ?",
+        options: ["-cos(θ)", "cos(θ)", "sin(θ)", "-sin(θ)"],
+        answer: "-cos(θ)",
+        solution: "Formula: cos(180° - θ) = -cos(θ)" },
+          { question: "tan(180° - θ) = ?",
+        options: ["-tan(θ)", "tan(θ)", "cot(θ)", "-cot(θ)"],
+        answer: "-tan(θ)",
+        solution: "Formula: tan(180° - θ) = -tan(θ)" },
+          { question: "sin(90° + θ) = ?",
+        options: ["cos(θ)", "-cos(θ)", "sin(θ)", "-sin(θ)"],
+        answer: "cos(θ)",
+        solution: "Formula: sin(90° + θ) = cos(θ)" }
+        ],
+        "Set 4": [
+          { question: "cos(90° + θ) = ?",
+        options: ["-sin(θ)", "sin(θ)", "cos(θ)", "-cos(θ)"],
+        answer: "-sin(θ)",
+        solution: "Formula: cos(90° + θ) = -sin(θ)" },
+          { question: "tan(90° + θ) = ?",
+        options: ["-cot(θ)", "cot(θ)", "tan(θ)", "-tan(θ)"],
+        answer: "-cot(θ)",
+        solution: "Formula: tan(90° + θ) = -cot(θ)" },
+          { question: "cot(90° + θ) = ?",
+        options: ["-tan(θ)", "tan(θ)", "cot(θ)", "-cot(θ)"],
+        answer: "-tan(θ)",
+        solution: "Formula: cot(90° + θ) = -tan(θ)" },
+          { question: "sec(90° + θ) = ?",
+        options: ["-cosec(θ)", "cosec(θ)", "sec(θ)", "-sec(θ)"],
+        answer: "-cosec(θ)",
+        solution: "Formula: sec(90° + θ) = -cosec(θ)" },
+          { question: "cosec(90° + θ) = ?",
+        options: ["sec(θ)", "-sec(θ)", "cosec(θ)", "-cosec(θ)"],
+        answer: "sec(θ)",
+        solution: "Formula: cosec(90° + θ) = sec(θ)" },
+          { question: "sin(270° - θ) = ?",
+        options: ["-cos(θ)", "cos(θ)", "sin(θ)", "-sin(θ)"],
+        answer: "-cos(θ)",
+        solution: "Formula: sin(270° - θ) = -cos(θ)" },
+          { question: "cos(270° - θ) = ?",
+        options: ["-sin(θ)", "sin(θ)", "cos(θ)", "-cos(θ)"],
+        answer: "-sin(θ)",
+        solution: "Formula: cos(270° - θ) = -sin(θ)" },
+          { question: "tan(270° - θ) = ?",
+        options: ["cot(θ)", "-cot(θ)", "tan(θ)", "-tan(θ)"],
+        answer: "cot(θ)",
+        solution: "Formula: tan(270° - θ) = cot(θ)" },
+          { question: "cot(270° - θ) = ?",
+        options: ["tan(θ)", "-tan(θ)", "cot(θ)", "-cot(θ)"],
+        answer: "tan(θ)",
+        solution: "Formula: cot(270° - θ) = tan(θ)" },
+          { question: "sec(270° - θ) = ?",
+        options: ["-cosec(θ)", "cosec(θ)", "sec(θ)", "-sec(θ)"],
+        answer: "-cosec(θ)",
+        solution: "Formula: sec(270° - θ) = -cosec(θ)" }
+        ],
+        "Set 5": [
+          { question: "cosec(270° - θ) = ?",
+        options: ["sec(θ)", "-sec(θ)", "cosec(θ)", "-cosec(θ)"],
+        answer: "sec(θ)",
+        solution: "Formula: cosec(270° - θ) = sec(θ)" },
+          { question: "sin(θ) = ? (in terms of cosec(θ))",
+        options: ["1/cosec(θ)", "cosec(θ)", "-cosec(θ)", "-1/cosec(θ)"],
+        answer: "1/cosec(θ)",
+        solution: "Formula: sin(θ) = 1/cosec(θ)" },
+          { question: "cos(θ) = ? (in terms of sec(θ))",
+        options: ["1/sec(θ)", "sec(θ)", "-sec(θ)", "-1/sec(θ)"],
+        answer: "1/sec(θ)",
+        solution: "Formula: cos(θ) = 1/sec(θ)" },
+          { question: "tan(θ) = ? (in terms of cot(θ))",
+        options: ["1/cot(θ)", "cot(θ)", "-cot(θ)", "-1/cot(θ)"],
+        answer: "1/cot(θ)",
+        solution: "Formula: tan(θ) = 1/cot(θ)" },
+          { question: "cot(θ) = ? (in terms of tan(θ))",
+        options: ["1/tan(θ)", "tan(θ)", "-tan(θ)", "-1/tan(θ)"],
+        answer: "1/tan(θ)",
+        solution: "Formula: cot(θ) = 1/tan(θ)" },
+          { question: "sec(θ) = ? (in terms of cos(θ))",
+        options: ["1/cos(θ)", "cos(θ)", "-cos(θ)", "-1/cos(θ)"],
+        answer: "1/cos(θ)",
+        solution: "Formula: sec(θ) = 1/cos(θ)" },
+          { question: "cosec(θ) = ? (in terms of sin(θ))",
+        options: ["1/sin(θ)", "sin(θ)", "-sin(θ)", "-1/sin(θ)"],
+        answer: "1/sin(θ)",
+        solution: "Formula: cosec(θ) = 1/sin(θ)" },
+          { question: "sin(2θ) = ?",
+        options: ["2sin(θ)cos(θ)", "sin²(θ)", "2cos(θ)", "cos²(θ)"],
+        answer: "2sin(θ)cos(θ)",
+        solution: "Formula: sin(2θ) = 2sin(θ)cos(θ)" },
+          { question: "cos(2θ) = ?",
+        options: ["cos²(θ) - sin²(θ)", "2cos(θ)", "2sin(θ)", "sin²(θ) - cos²(θ)"],
+        answer: "cos²(θ) - sin²(θ)",
+        solution: "Formula: cos(2θ) = cos²(θ) - sin²(θ)" },
+          { question: "tan(2θ) = ?",
+        options: ["2tan(θ)/(1-tan²(θ))", "tan²(θ)", "2tan(θ)", "tan(θ)/(1-2tan²(θ))"],
+        answer: "2tan(θ)/(1-tan²(θ))",
+        solution: "Formula: tan(2θ) = 2tan(θ)/(1-tan²(θ))" }
+        ],
+        "Set 6": [
+          { question: "sin(3θ) = ?",
+        options: ["3sin(θ) - 4sin³(θ)", "3sin(θ) + 4sin³(θ)", "4sin(θ) - 3sin³(θ)", "sin³(θ) - 3sin(θ)"],
+        answer: "3sin(θ) - 4sin³(θ)",
+        solution: "Formula: sin(3θ) = 3sin(θ) - 4sin³(θ)" },
+          { question: "cos(3θ) = ?",
+        options: ["4cos³(θ) - 3cos(θ)", "3cos(θ) - 4cos³(θ)", "cos³(θ) - 3cos(θ)", "3cos(θ) + 4cos³(θ)"],
+        answer: "4cos³(θ) - 3cos(θ)",
+        solution: "Formula: cos(3θ) = 4cos³(θ) - 3cos(θ)" },
+          { question: "sin(A + B) = ?",
+        options: ["sinAcosB + cosAsinB", "sinA + sinB", "cosAcosB - sinAsinB", "sinAcosB - cosAsinB"],
+        answer: "sinAcosB + cosAsinB",
+        solution: "Formula: sin(A+B) = sinAcosB + cosAsinB" },
+          { question: "cos(A + B) = ?",
+        options: ["cosAcosB - sinAsinB", "cosA + cosB", "sinAcosB + cosAsinB", "sinA + sinB"],
+        answer: "cosAcosB - sinAsinB",
+        solution: "Formula: cos(A+B) = cosAcosB - sinAsinB" },
+          { question: "tan(A + B) = ?",
+        options: ["(tanA + tanB)/(1 - tanA tanB)", "tanA + tanB", "(tanA - tanB)/(1 + tanA tanB)", "tanA tanB"],
+        answer: "(tanA + tanB)/(1 - tanA tanB)",
+        solution: "Formula: tan(A+B) = (tanA + tanB)/(1 - tanA tanB)" },
+          { question: "sin(A - B) = ?",
+        options: ["sinAcosB - cosAsinB", "sinA - sinB", "cosAcosB + sinAsinB", "sinAcosB + cosAsinB"],
+        answer: "sinAcosB - cosAsinB",
+        solution: "Formula: sin(A-B) = sinAcosB - cosAsinB" },
+          { question: "cos(A - B) = ?",
+        options: ["cosAcosB + sinAsinB", "cosA - cosB", "sinAcosB - cosAsinB", "sinA + sinB"],
+        answer: "cosAcosB + sinAsinB",
+        solution: "Formula: cos(A-B) = cosAcosB + sinAsinB" },
+          { question: "tan(A - B) = ?",
+        options: ["(tanA - tanB)/(1 + tanA tanB)", "tanA - tanB", "(tanA + tanB)/(1 - tanA tanB)", "tanA tanB"],
+        answer: "(tanA - tanB)/(1 + tanA tanB)",
+        solution: "Formula: tan(A-B) = (tanA - tanB)/(1 + tanA tanB)" },
+          { question: "sin²(θ) = ? (in terms of cos(2θ))",
+        options: ["(1 - cos(2θ))/2", "(1 + cos(2θ))/2", "cos(2θ)", "1 - cos(2θ)"],
+        answer: "(1 - cos(2θ))/2",
+        solution: "Formula: sin²(θ) = (1 - cos(2θ))/2" },
+          { question: "cos²(θ) = ? (in terms of cos(2θ))",
+        options: ["(1 + cos(2θ))/2", "(1 - cos(2θ))/2", "cos(2θ)", "1 + cos(2θ)"],
+        answer: "(1 + cos(2θ))/2",
+        solution: "Formula: cos²(θ) = (1 + cos(2θ))/2" }
+        ],
+        "Set 7": [
+          { question: "tan²(θ) = ? (in terms of sec²(θ))",
+        options: ["sec²(θ) - 1", "sec²(θ) + 1", "1 - sec²(θ)", "1 + sec²(θ)"],
+        answer: "sec²(θ) - 1",
+        solution: "Formula: tan²(θ) = sec²(θ) - 1" },
+          { question: "cot²(θ) = ? (in terms of cosec²(θ))",
+        options: ["cosec²(θ) - 1", "cosec²(θ) + 1", "1 - cosec²(θ)", "1 + cosec²(θ)"],
+        answer: "cosec²(θ) - 1",
+        solution: "Formula: cot²(θ) = cosec²(θ) - 1" },
+          { question: "If tan(θ) = 1, θ = ?",
+        options: ["45°", "30°", "60°", "90°"],
+        answer: "45°",
+        solution: "tan(45°) = 1" },
+          { question: "If sin(θ) = 1/2, θ = ?",
+        options: ["30°", "45°", "60°", "90°"],
+        answer: "30°",
+        solution: "sin(30°) = 1/2" },
+          { question: "If cos(θ) = 1/2, θ = ?",
+        options: ["60°", "30°", "45°", "90°"],
+        answer: "60°",
+        solution: "cos(60°) = 1/2" },
+          { question: "If tan(θ) = √3, θ = ?",
+        options: ["60°", "30°", "45°", "90°"],
+        answer: "60°",
+        solution: "tan(60°) = √3" },
+          { question: "If sin(θ) = √3/2, θ = ?",
+        options: ["60°", "30°", "45°", "90°"],
+        answer: "60°",
+        solution: "sin(60°) = √3/2" },
+          { question: "If cos(θ) = √3/2, θ = ?",
+        options: ["30°", "60°", "45°", "90°"],
+        answer: "30°",
+        solution: "cos(30°) = √3/2" },
+          { question: "If tan(θ) = 1/√3, θ = ?",
+        options: ["30°", "60°", "45°", "90°"],
+        answer: "30°",
+        solution: "tan(30°) = 1/√3" },
+          { question: "If sin(θ) = 1, θ = ?",
+        options: ["90°", "0°", "45°", "60°"],
+        answer: "90°",
+        solution: "sin(90°) = 1" }
+        ],
+        "Set 8": [
+          { question: "If cos(θ) = 0, θ = ?",
+        options: ["90°", "0°", "45°", "60°"],
+        answer: "90°",
+        solution: "cos(90°) = 0" },
+          { question: "If tan(θ) = 0, θ = ?",
+        options: ["0°", "90°", "45°", "60°"],
+        answer: "0°",
+        solution: "tan(0°) = 0" },
+          { question: "If sin(θ) = 0, θ = ?",
+        options: ["0°", "90°", "45°", "60°"],
+        answer: "0°",
+        solution: "sin(0°) = 0" },
+          { question: "If cos(θ) = 1, θ = ?",
+        options: ["0°", "90°", "45°", "60°"],
+        answer: "0°",
+        solution: "cos(0°) = 1" },
+          { question: "If tan(θ) is undefined, θ = ?",
+        options: ["90°", "0°", "45°", "60°"],
+        answer: "90°",
+        solution: "tan(90°) is undefined" },
+          { question: "sin(θ) = cos(90° - θ). True or False?",
+        options: ["True", "False"],
+        answer: "True",
+        solution: "sin(θ) = cos(90° - θ) (co-function identity)" },
+          { question: "cos(θ) = sin(90° - θ). True or False?",
+        options: ["True", "False"],
+        answer: "True",
+        solution: "cos(θ) = sin(90° - θ) (co-function identity)" },
+          { question: "tan(θ) = cot(90° - θ). True or False?",
+        options: ["True", "False"],
+        answer: "True",
+        solution: "tan(θ) = cot(90° - θ) (co-function identity)" },
+          { question: "cot(θ) = tan(90° - θ). True or False?",
+        options: ["True", "False"],
+        answer: "True",
+        solution: "cot(θ) = tan(90° - θ) (co-function identity)" },
+          { question: "sec(θ) = cosec(90° - θ). True or False?",
+        options: ["True", "False"],
+        answer: "True",
+        solution: "sec(θ) = cosec(90° - θ) (co-function identity)" }
+        ],
+        "Set 9": [
+          { question: "cosec(θ) = sec(90° - θ). True or False?",
+        options: ["True", "False"],
+        answer: "True",
+        solution: "cosec(θ) = sec(90° - θ) (co-function identity)" },
+          { question: "sin(θ) is positive in which quadrants?",
+        options: ["I and II", "I and IV", "II and III", "III and IV"],
+        answer: "I and II",
+        solution: "sin(θ) is positive in I and II quadrants" },
+          { question: "cos(θ) is positive in which quadrants?",
+        options: ["I and IV", "I and II", "II and III", "III and IV"],
+        answer: "I and IV",
+        solution: "cos(θ) is positive in I and IV quadrants" },
+          { question: "tan(θ) is positive in which quadrants?",
+        options: ["I and III", "I and II", "II and IV", "III and IV"],
+        answer: "I and III",
+        solution: "tan(θ) is positive in I and III quadrants" },
+          { question: "sin(θ) is negative in which quadrants?",
+        options: ["III and IV", "I and II", "II and III", "I and IV"],
+        answer: "III and IV",
+        solution: "sin(θ) is negative in III and IV quadrants" },
+          { question: "cos(θ) is negative in which quadrants?",
+        options: ["II and III", "I and IV", "I and II", "III and IV"],
+        answer: "II and III",
+        solution: "cos(θ) is negative in II and III quadrants" },
+          { question: "tan(θ) is negative in which quadrants?",
+        options: ["II and IV", "I and III", "I and II", "III and IV"],
+        answer: "II and IV",
+        solution: "tan(θ) is negative in II and IV quadrants" },
+          { question: "sin(θ) = -sin(-θ). True or False?",
+        options: ["True", "False"],
+        answer: "True",
+        solution: "sin(θ) is an odd function: sin(-θ) = -sin(θ)" },
+          { question: "cos(θ) = cos(-θ). True or False?",
+        options: ["True", "False"],
+        answer: "True",
+        solution: "cos(θ) is an even function: cos(-θ) = cos(θ)" },
+          { question: "tan(θ) = -tan(-θ). True or False?",
+        options: ["True", "False"],
+        answer: "True",
+        solution: "tan(θ) is an odd function: tan(-θ) = -tan(θ)" }
+        ],
+        "Set 10": [
+          { question: "sin(180° + θ) = ?",
+        options: ["-sin(θ)", "sin(θ)", "cos(θ)", "-cos(θ)"],
+        answer: "-sin(θ)",
+        solution: "sin(180° + θ) = -sin(θ)" },
+          { question: "cos(180° + θ) = ?",
+        options: ["-cos(θ)", "cos(θ)", "sin(θ)", "-sin(θ)"],
+        answer: "-cos(θ)",
+        solution: "cos(180° + θ) = -cos(θ)" },
+          { question: "tan(180° + θ) = ?",
+        options: ["tan(θ)", "-tan(θ)", "cot(θ)", "-cot(θ)"],
+        answer: "tan(θ)",
+        solution: "tan(180° + θ) = tan(θ)" },
+          { question: "sin(360° - θ) = ?",
+        options: ["-sin(θ)", "sin(θ)", "cos(θ)", "-cos(θ)"],
+        answer: "-sin(θ)",
+        solution: "sin(360° - θ) = -sin(θ)" },
+          { question: "cos(360° - θ) = ?",
+        options: ["cos(θ)", "-cos(θ)", "sin(θ)", "-sin(θ)"],
+        answer: "cos(θ)",
+        solution: "cos(360° - θ) = cos(θ)" },
+          { question: "tan(360° - θ) = ?",
+        options: ["-tan(θ)", "tan(θ)", "cot(θ)", "-cot(θ)"],
+        answer: "-tan(θ)",
+        solution: "tan(360° - θ) = -tan(θ)" },
+          { question: "sin(θ + 360°) = ?",
+        options: ["sin(θ)", "-sin(θ)", "cos(θ)", "-cos(θ)"],
+        answer: "sin(θ)",
+        solution: "sin(θ + 360°) = sin(θ)" },
+          { question: "cos(θ + 360°) = ?",
+        options: ["cos(θ)", "-cos(θ)", "sin(θ)", "-sin(θ)"],
+        answer: "cos(θ)",
+        solution: "cos(θ + 360°) = cos(θ)" },
+          { question: "tan(θ + 360°) = ?",
+        options: ["tan(θ)", "-tan(θ)", "cot(θ)", "-cot(θ)"],
+        answer: "tan(θ)",
+        solution: "tan(θ + 360°) = tan(θ)" },
+          { question: "sin(θ) = sin(180° - θ). True or False?",
+        options: ["True", "False"],
+        answer: "True",
+        solution: "sin(θ) = sin(180° - θ)" }
+        ]
+      },
+      "Arithmetic": {
+        "Set 1": [
+          { question: "Find Simple Interest: P=1000, R=5%, T=2 years",
+            options: ["100", "120", "110", "105"],
+            answer: "100",
+            solution: "Formula: SI = (P×R×T)/100 = (1000×5×2)/100 = 100" },
+          { question: "Find Compound Interest: P=1000, R=10%, T=2 years",
+            options: ["210", "200", "220", "205"],
+            answer: "210",
+            solution: "Formula: CI = P(1+R/100)ᵗ - P = 1000(1.1)² - 1000 = 1210 - 1000 = 210" },
+          { question: "If 20% of a number is 40, find the number",
+            options: ["200", "180", "220", "240"],
+            answer: "200",
+            solution: "Formula: 20% of x = 40 → (20/100) × x = 40 → x = 40 × 5 = 200" },
+          { question: "Average of 12, 16, 20, 24",
+            options: ["18", "17", "19", "16"],
+            answer: "18",
+            solution: "Formula: Average = Sum/Count = (12+16+20+24)/4 = 72/4 = 18" },
+          { question: "LCM of 12 and 18",
+            options: ["36", "6", "216", "30"],
+            answer: "36",
+            solution: "Formula: LCM = (a×b)/GCD = (12×18)/6 = 216/6 = 36" }
+        ]
+      },
+      "Mensuration": {
+        "Set 1": [
+          { question: "Volume of a cube with side=3 cm",
+            options: ["9", "27", "18", "36"],
+            answer: "27",
+            solution: "Formula: V = a³ = 3³ = 27 cm³" },
+          { question: "Volume of a cylinder with r=7, h=10",
+            options: ["1540", "490", "154", "770"],
+            answer: "1540",
+            solution: "Formula: V = πr²h = π × 7² × 10 = 490π ≈ 1540" },
+          { question: "Surface area of a cube with side=4",
+            options: ["96", "64", "48", "24"],
+            answer: "96",
+            solution: "Formula: SA = 6a² = 6 × 4² = 6 × 16 = 96" },
+          { question: "Volume of a sphere with radius=3",
+            options: ["113", "36π", "27π", "108"],
+            answer: "113",
+            solution: "Formula: V = (4/3)πr³ = (4/3)π × 3³ = 36π ≈ 113" },
+          { question: "Area of a parallelogram with base=8, height=5",
+            options: ["40", "26", "20", "13"],
+            answer: "40",
+            solution: "Formula: Area = base × height = 8 × 5 = 40" }
+        ]
+      },
+      "Statistics": {
+        "Set 1": [
+          { question: "Mean of 2, 4, 6, 8",
+            options: ["4", "5", "6", "7"],
+            answer: "5",
+            solution: "Formula: Mean = (Σx)/n = (2+4+6+8)/4 = 20/4 = 5" },
+          { question: "Median of 3, 7, 2, 9, 5",
+            options: ["5", "7", "6", "4"],
+            answer: "5",
+            solution: "Formula: Arrange in order: 2,3,5,7,9. Median = middle value = 5" },
+          { question: "Mode of 2, 3, 3, 4, 5, 3, 6",
+            options: ["3", "4", "2", "5"],
+            answer: "3",
+            solution: "Formula: Mode = most frequent value. 3 appears 3 times" },
+          { question: "Range of 10, 15, 8, 20, 12",
+            options: ["12", "10", "8", "15"],
+            answer: "12",
+            solution: "Formula: Range = Max - Min = 20 - 8 = 12" },
+          { question: "Find variance of 1, 2, 3, 4, 5",
+            options: ["2", "2.5", "1.5", "3"],
+            answer: "2",
+            solution: "Formula: Mean=3, Variance=Σ(x-mean)²/n = (4+1+0+1+4)/5 = 10/5 = 2" }
+        ]
+      }
+    };
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-let chapters = ["Algebra","Geometry","Trigonometry","Arithmetic","Mensuration","Statistics"];
-let currentChapter="", currentSet="", questions=[], current=0, score=0, answers=[], timerInterval, timeLeft=120;
+    // ⚙️ State
+    let currentChapter = "";
+    let questions = [];
+    let current = 0;
+    let score = 0;
+    let answers = [];
+    let timerInterval;
+    let timeLeft = 30;
 
-// Populate chapters
-const chaptersDiv=document.getElementById('chapters');
-chapters.forEach(ch=>{
-  const btn=document.createElement('button');
-  btn.className='chapter-btn'; btn.innerText=ch;
-  btn.onclick=()=>showSets(ch);
-  chaptersDiv.appendChild(btn);
-});
-
-// Show sets by fetching JSON files dynamically
-function showSets(chapter){
-currentChapter=chapter; document.getElementById('chapter-container').style.display='none';
-document.getElementById('set-container').style.display='block';
-document.getElementById('set-title').innerText="Select a Set for "+chapter;
-const setsDiv=document.getElementById('sets'); setsDiv.innerHTML='';
-
-// Example: scan for sets (you must have algebra-set1.json, algebra-set2.json etc)
-for(let i=1;i<=5;i++){ // Try first 5 sets
-  const url=`chapters/${chapter.toLowerCase()}-set${i}.json`;
-  fetch(url).then(r=>{
-    if(r.ok){
-      const btn=document.createElement('button');
-      btn.className='set-btn'; btn.innerText='Set '+i;
-      btn.onclick=()=>startQuizFromJSON(chapter,'set'+i);
-      setsDiv.appendChild(btn);
+    function showSets(chapter) {
+      currentChapter = chapter;
+      document.getElementById("chapter-list").style.display = "none";
+      document.getElementById("set-list").style.display = "block";
+      document.getElementById("set-title").innerText = "Select a Set for " + chapter;
+      let setButtons = "";
+      for (let set in questionBank[chapter]) {
+        setButtons += `<button class="btn" onclick="startQuiz('${chapter}','${set}')">${set}</button>`;
+      }
+      document.getElementById("sets").innerHTML = setButtons;
     }
-  }).catch(err=>{});
-}
-}
 
-// Back to chapters
-function backToChapters(){document.getElementById('set-container').style.display='none'; document.getElementById('chapter-container').style.display='block';}
+    function backToChapters() {
+      document.getElementById("set-list").style.display = "none";
+      document.getElementById("chapter-list").style.display = "block";
+    }
 
-// Start quiz from JSON
-async function startQuizFromJSON(chapter,set){
-try{
-  const url=`chapters/${chapter.toLowerCase()}-${set}.json`;
-  const resp=await fetch(url);
-  questions=await resp.json(); current=0; score=0; answers=[];
-  document.getElementById('set-container').style.display='none';
-  document.getElementById('quiz-container').style.display='block';
-  loadQuestion();
-}catch(e){alert("Error loading JSON!"); console.error(e);}
-}
+    function startQuiz(chapter, set) {
+      questions = questionBank[chapter][set];
+      current = 0;
+      score = 0;
+      answers = [];
+      document.getElementById("set-list").style.display = "none";
+      document.getElementById("quiz-container").style.display = "block";
+      loadQuestion();
+    }
 
-// Load question
-function loadQuestion(){
-if(current<questions.length){
-  const q=questions[current];
-  document.getElementById('question').innerText=(current+1)+". "+q.question;
-  const optsDiv=document.getElementById('options'); optsDiv.innerHTML='';
-  document.getElementById('solution').style.display='none';
-  document.querySelector('.scratchpad').value='';
-  q.options.forEach(opt=>{
-    const btn=document.createElement('button');
-    btn.innerText=opt;
-    btn.onclick=()=>checkAnswer(btn,opt,q.solution);
-    optsDiv.appendChild(btn);
-  });
-  startTimer();
-}else submitQuiz();
-}
+    function loadQuestion() {
+      if (current < questions.length) {
+        const q = questions[current];
+        document.getElementById('question').innerText = (current+1) + ". " + q.question;
+        document.getElementById('options').innerHTML = '';
+        document.getElementById('solution').style.display = 'none';
+        q.options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.innerText = opt;
+          btn.onclick = () => checkAnswer(btn, opt, q.solution);
+          document.getElementById('options').appendChild(btn);
+        });
+        startTimer();
+      } else {
+        submitQuiz();
+      }
+    }
 
-// Timer
-function startTimer(){
-timeLeft=120; clearInterval(timerInterval);
-updateTimerText();
-timerInterval=setInterval(()=>{
-  timeLeft--; updateTimerText();
-  if(timeLeft<=0){clearInterval(timerInterval); current++; loadQuestion();}
-},1000);
-}
-function updateTimerText(){
-const min=Math.floor(timeLeft/60), sec=timeLeft%60;
-document.getElementById('timer').innerText=`⏳ Time: ${min}:${sec<10?'0'+sec:sec}`;
-}
+    function startTimer() {
+      timeLeft = 120;
+      document.getElementById("timer").innerText = "⏳ Time: " + timeLeft + "s";
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").innerText = "⏳ Time: " + timeLeft + "s";
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          current++;
+          loadQuestion();
+        }
+      }, 1000);
+    }
 
-// Check answer
-function checkAnswer(button,selected,solutionText){
-const correct=questions[current].answer;
-document.querySelectorAll('.options button').forEach(b=>b.disabled=true);
-if(selected===correct){button.classList.add('correct'); score++;}
-else{button.classList.add('wrong'); document.querySelectorAll('.options button').forEach(b=>{if(b.innerText===correct)b.classList.add('correct');});}
-answers.push({q:questions[current].question, selected, correct, solution:solutionText});
-document.getElementById('score').innerText="Score: "+score;
-document.getElementById('solution').innerText="📝 "+solutionText; document.getElementById('solution').style.display='block';
-clearInterval(timerInterval);
-setTimeout(()=>{current++; loadQuestion();},3000);
-}
+    function checkAnswer(button, selected, solutionText) {
+      const correct = questions[current].answer;
+      const btns = document.querySelectorAll(".options button");
+      btns.forEach(b => b.disabled = true);
+      if (selected === correct) {
+        score++;
+        button.classList.add("correct");
+      } else {
+        button.classList.add("wrong");
+        btns.forEach(b => { if (b.innerText === correct) b.classList.add("correct"); });
+      }
+      answers.push({q: questions[current].question, selected, correct, solution: solutionText});
+      document.getElementById('score').innerText = "Score: " + score;
+      document.getElementById('solution').innerText = "📝 " + solutionText;
+      document.getElementById('solution').style.display = 'block';
+      clearInterval(timerInterval);
+      setTimeout(() => { current++; loadQuestion(); }, 3000);
+    }
 
-// Submit Quiz
-function submitQuiz(){
-clearInterval(timerInterval);
-let reportHTML=`<h2>📊 Quiz Report</h2><p>Your Score: ${score}/${questions.length}</p>`;
-answers.forEach((a,i)=>{
-let status=a.selected===a.correct?`<span class="correct-answer">✅ Correct</span>`:`<span class="wrong-answer">❌ Wrong</span>`;
-reportHTML+=`<div class="report-item"><b>Q${i+1}: ${a.q}</b><br>Your Answer: ${a.selected}<br>Correct Answer: ${a.correct}<br>${status}<br><i>${a.solution}</i></div>`;
-});
-reportHTML+=`<button onclick="downloadPDF()">⬇ Download PDF</button><br><button onclick="location.reload()">⬅ Back to Chapters</button>`;
-document.getElementById('quiz-container').innerHTML=reportHTML;
-}
+    function submitQuiz() {
+      clearInterval(timerInterval);
+      let reportHTML = `<h2>📊 Quiz Report</h2><p>Your Score: ${score}/${questions.length}</p>`;
+      answers.forEach((a, i) => {
+        let status = a.selected === a.correct ?
+          `<span class="correct-answer">✅ Correct</span>` :
+          `<span class="wrong-answer">❌ Wrong</span>`;
+        reportHTML += `
+          <div class="report-item">
+            <b>Q${i+1}: ${a.q}</b><br>
+            Your Answer: ${a.selected}<br>
+            Correct Answer: ${a.correct}<br>
+            ${status}<br>
+            <i>${a.solution}</i>
+          </div>
+        `;
+      });
+      reportHTML += `<button onclick="downloadPDF()">⬇ Download PDF</button><br><button onclick="location.reload()">⬅ Back to Chapters</button>`;
+      document.getElementById('quiz-container').innerHTML = reportHTML;
+    }
 
-// PDF download
-function downloadPDF(){
-const { jsPDF } = window.jspdf; const doc=new jsPDF();
-doc.setFontSize(14); doc.text("SSC Maths Quiz Report",10,10); let y=20;
-answers.forEach((a,i)=>{
-doc.text(`Q${i+1}: ${a.q}`,10,y); y+=6;
-doc.text(`Your Answer: ${a.selected}`,10,y); y+=6;
-doc.text(`Correct Answer: ${a.correct}`,10,y); y+=6;
-doc.text(`Solution: ${a.solution}`,10,y); y+=10;
-if(y>270){ doc.addPage(); y=20; }
-});
-doc.save("SSC_Maths_Quiz_Report.pdf");
-}
-</script>
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(14);
+      doc.text("SSC Quiz Report", 10, 10);
+      let y = 20;
+      answers.forEach((a, i) => {
+        doc.text(`Q${i+1}: ${a.q}`, 10, y); y+=6;
+        doc.text(`Your Answer: ${a.selected}`, 10, y); y+=6;
+        doc.text(`Correct Answer: ${a.correct}`, 10, y); y+=6;
+        doc.text(`Solution: ${a.solution}`, 10, y); y+=10;
+        if (y > 270) { doc.addPage(); y=20; }
+      });
+      doc.save("quiz-report.pdf");
+    }
+  </script>
 </body>
 </html>
