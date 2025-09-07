@@ -61,16 +61,22 @@
     const chapterFile = urlParams.get('chapter') || 'algebra-set1.json';
     document.getElementById("chapter-title").innerText = "Chapter: " + chapterFile.replace(".json","");
 
-    // fetch JSON with error handling
+    // ✅ fixed fetch with clear error display
     fetch("chapters/" + chapterFile)
       .then(response => {
         if (!response.ok) throw new Error("HTTP error " + response.status);
         return response.json();
       })
-      .then(data => { questions = data; loadQuestion(); })
+      .then(data => {
+        if (!Array.isArray(data)) throw new Error("Invalid JSON format: expected an array");
+        questions = data;
+        loadQuestion();
+      })
       .catch(err => {
         document.getElementById("quiz-container").innerHTML =
-          "<p style='color:red'>❌ Error loading quiz: " + err.message + "</p>";
+          "<p style='color:red; font-weight:bold'>❌ Error loading quiz file: " 
+          + chapterFile + "<br>" + err.message + "</p>";
+        console.error("Quiz Load Error:", err);
       });
 
     function loadQuestion() {
@@ -150,4 +156,17 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       doc.setFontSize(14);
-      doc.te
+      doc.text("SSC Quiz Report", 10, 10);
+      let y = 20;
+      answers.forEach((a, i) => {
+        doc.text(`Q${i+1}: ${a.q}`, 10, y); y+=6;
+        doc.text(`Your Answer: ${a.selected}`, 10, y); y+=6;
+        doc.text(`Correct Answer: ${a.correct}`, 10, y); y+=6;
+        doc.text(`Solution: ${a.solution}`, 10, y); y+=10;
+        if (y > 270) { doc.addPage(); y=20; }
+      });
+      doc.save("quiz-report.pdf");
+    }
+  </script>
+</body>
+</html>
