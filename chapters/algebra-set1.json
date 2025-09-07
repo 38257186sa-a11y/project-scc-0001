@@ -3,14 +3,12 @@
     "question": "Solve: 2x + 3 = 11",
     "options": ["x=3", "x=4", "x=5", "x=6"],
     "answer": "x=4",
-    "hint": "Subtract 3 and divide by 2.",
     "solution": "2x + 3 = 11 → 2x = 8 → x = 4."
   },
   {
     "question": "Simplify: (x+2)(x+4)",
     "options": ["x²+6x+8", "x²+8", "x²+4x+4", "x²+2x+4"],
     "answer": "x²+6x+8",
-    "hint": "Use distributive law (a+b)(c+d).",
     "solution": "(x+2)(x+4) = x² + 4x + 2x + 8 = x² + 6x + 8."
   }
 ]
