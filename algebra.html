@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SSC Maths Prep - Algebra</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+    }
+    .quiz-container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .question {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #ecf0f1;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .options button:hover {
+      background: #dcdde1;
+    }
+    .hint {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f9f9f9;
+      border-left: 4px solid #3498db;
+      display: none;
+    }
+    .controls {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .controls button {
+      margin: 5px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #3498db;
+      color: white;
+      cursor: pointer;
+    }
+    .controls button:hover {
+      background: #2980b9;
+    }
+    .score {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>SSC Maths Preparation - Algebra</h1>
+  <div class="quiz-container">
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="hint" id="hint"></div>
+    <div class="controls">
+      <button onclick="showHint()">Show Hint</button>
+      <button onclick="nextQuestion()">Next</button>
+    </div>
+    <div class="score" id="score"></div>
+  </div>
+
+  <script>
+    let questions = [];
+    let current = 0;
+    let score = 0;
+
+    // Load JSON file
+    fetch('algebra.json')
+      .then(response => response.json())
+      .then(data => {
+        questions = data;
+        loadQuestion();
+      });
+
+    function loadQuestion() {
+      if (current < questions.length) {
+        const q = questions[current];
+        document.getElementById('question').innerText = (current+1) + ". " + q.question;
+        document.getElementById('options').innerHTML = '';
+        document.getElementById('hint').style.display = 'none';
+        q.options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.innerText = opt;
+          btn.onclick = () => checkAnswer(opt);
+          document.getElementById('options').appendChild(btn);
+        });
+      } else {
+        document.getElementById('quiz-container').innerHTML = `
+          <h2>Test Completed!</h2>
+          <p>Your Final Score: ${score}/${questions.length}</p>
+        `;
+      }
+    }
+
+    function checkAnswer(selected) {
+      const correct = questions[current].answer;
+      if (selected === correct) {
+        score++;
+        alert("✅ Correct!");
+      } else {
+        alert("❌ Wrong! Correct answer is: " + correct);
+      }
+      document.getElementById('score').innerText = "Score: " + score;
+    }
+
+    function showHint() {
+      document.getElementById('hint').innerText = "💡 " + questions[current].hint;
+      document.getElementById('hint').style.display = 'block';
+    }
+
+    function nextQuestion() {
+      current++;
+      loadQuestion();
+    }
+  </script>
+</body>
+</html>
