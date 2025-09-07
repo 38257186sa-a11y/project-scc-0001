@@ -1,0 +1,20 @@
+[
+  {
+    "question": "If x + 3 = 7, what is the value of x?",
+    "options": ["2", "3", "4", "5"],
+    "answer": "4",
+    "hint": "Subtract 3 from both sides."
+  },
+  {
+    "question": "If 2x = 10, then x = ?",
+    "options": ["2", "4", "5", "10"],
+    "answer": "5",
+    "hint": "Divide both sides by 2."
+  },
+  {
+    "question": "Simplify: (x + 2)(x + 3)",
+    "options": ["x² + 6", "x² + 5x + 6", "x² + 5", "x² + 2x + 3"],
+    "answer": "x² + 5x + 6",
+    "hint": "Use distributive law: (a+b)(c+d) = ac + ad + bc + bd."
+  }
+]
