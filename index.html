@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SSC Maths — Foundation Hub</title>
+<meta name="description" content="Foundational homepage for SSC Maths preparation. Register chapters, take chapter quizzes, mock tests, and track progress (localStorage)." />
+<style>
+  :root{
+    --bg:#f6f8fb;
+    --card:#ffffff;
+    --muted:#6b7280;
+    --accent:#1f6feb;
+    --success:#16a34a;
+    --danger:#dc2626;
+    --radius:12px;
+    --glass: rgba(255,255,255,0.6);
+    --shadow: 0 6px 18px rgba(16,24,40,0.08);
+    --mono: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:var(--mono);
+    background: linear-gradient(180deg, var(--bg), #eef2ff 120%);
+    color:#0f172a;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.45;
+    padding:28px;
+  }
+
+  header{display:flex;gap:20px;align-items:center;justify-content:space-between;margin-bottom:22px}
+  .brand{display:flex;gap:16px;align-items:center}
+  .logo{
+    width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#7c3aed);
+    display:grid;place-items:center;color:white;font-weight:700;font-size:20px;box-shadow:var(--shadow)
+  }
+  h1{margin:0;font-size:20px}
+  p.lead{margin:0;color:var(--muted);font-size:13px}
+
+  .controls{display:flex;gap:12px;align-items:center}
+  button.primary{
+    background:var(--accent);color:white;border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600;
+    box-shadow: 0 6px 20px rgba(31,111,235,0.12);
+  }
+  button.ghost{background:transparent;border:1px solid rgba(15,23,42,0.06);padding:10px 14px;border-radius:10px;cursor:pointer}
+
+  main{display:grid;grid-template-columns:1fr 380px;gap:20px}
+  .left{
+    display:flex;flex-direction:column;gap:18px;
+  }
+
+  .cards{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;
+  }
+
+  .card{
+    background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;
+  }
+  .card h3{margin:0;font-size:16px}
+  .meta{font-size:12px;color:var(--muted)}
+  .card .row{display:flex;gap:8px;align-items:center}
+  .chip{font-size:12px;padding:6px 8px;border-radius:999px;background:#f3f4f6;color:#111827}
+
+  .progress{
+    height:10px;background:#eef2ff;border-radius:999px;overflow:hidden;margin-top:8px;
+  }
+  .progress > span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed);width:0%}
+
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+  .btn{padding:8px 10px;border-radius:8px;border:0;cursor:pointer;font-weight:600}
+  .btn.secondary{background:#f3f4f6;color:#0f172a}
+  .btn.warn{background:#ffedd5;color:#92400e}
+  .btn.success{background:var(--success);color:white}
+  .badge{padding:6px 8px;border-radius:8px;background:#ecfeff;color:#064e3b;font-size:12px;font-weight:700}
+
+  aside.card{position:sticky;top:28px}
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat{background:linear-gradient(180deg,#ffffff,#fafafa);padding:12px;border-radius:10px;box-shadow:var(--shadow)}
+  .small{font-size:12px;color:var(--muted)}
+  .big{font-size:20px;font-weight:700}
+
+  /* Modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:1000}
+  .modal{max-width:840px;width:100%;background:var(--card);border-radius:12px;padding:18px;box-shadow:0 10px 30px rgba(2,6,23,0.35)}
+  .modal header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .modal .content{max-height:60vh;overflow:auto}
+  .hint{background:#fff7ed;border-left:4px solid #f59e0b;padding:10px;border-radius:8px;color:#92400e}
+
+  footer{margin-top:26px;font-size:13px;color:var(--muted)}
+
+  /* Responsive */
+  @media (max-width:900px){
+    main{grid-template-columns:1fr}
+    aside.card{position:relative;top:0}
+  }
+  /* small details */
+  .muted{color:var(--muted);font-size:13px}
+  .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace}
+  .tiny{font-size:11px;color:var(--muted)}
+  input,select,textarea{font:inherit;padding:8px;border-radius:8px;border:1px solid #e6e9ef}
+  label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">SSC</div>
+    <div>
+      <h1>SSC Maths — Foundation Hub</h1>
+      <p class="lead">Organize chapters, run guided quizzes, and track completion. Your chapters live in folders — register their paths below.</p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="addChapterBtn" class="primary">+ Add Chapter</button>
+    <button id="openMock" class="ghost">Take Mock Test</button>
+    <button id="exportBtn" class="ghost">Export Progress</button>
+    <button id="importBtn" class="ghost">Import Progress</button>
+  </div>
+</header>
+
+<main>
+  <section class="left">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 style="margin:0">Your Chapters</h2>
+          <div class="tiny">Create or register chapter folders; progress will be tracked here.</div>
+        </div>
+        <div class="chip mono" id="chapterCount">0 chapters</div>
+      </div>
+    </div>
+
+    <div class="cards" id="chaptersGrid">
+      <!-- Chapter cards injected here -->
+    </div>
+
+    <div class="card">
+      <h3>Quick Guide & design notes</h3>
+      <p class="muted">How you should structure each chapter folder (suggestion):</p>
+      <ol style="color:var(--muted);margin-left:16px">
+        <li><strong>index.html</strong> — chapter landing (concepts, examples, practice links)</li>
+        <li><strong>quiz.html</strong> — optional chapter-specific quiz (if you want a separate page)</li>
+        <li><strong>/assets</strong> — images or PDFs used by the chapter</li>
+      </ol>
+      <p class="muted">When you click <em>Open</em> from a chapter card the hub will open the path you provided. If you want the hub to auto-mark completion, use the chapter quiz inside this hub (recommended).</p>
+    </div>
+  </section>
+
+  <aside class="card">
+    <h3>Progress Snapshot</h3>
+    <div class="stats" style="margin-top:10px">
+      <div class="stat">
+        <div class="small">Chapters registered</div>
+        <div class="big" id="statChapters">0</div>
+      </div>
+      <div class="stat">
+        <div class="small">Completed</div>
+        <div class="big" id="statCompleted">0</div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px">
+      <div class="small">Total mock attempts</div>
+      <div class="big" id="statMocks">0</div>
+      <div class="tiny" style="margin-top:6px">Progress stored locally in this browser. Export to save externally.</div>
+    </div>
+  </aside>
+</main>
+
+<!-- Modal backdrop -->
+<div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <header>
+      <h3 id="modalTitle">Modal</h3>
+      <div>
+        <button id="modalClose" class="btn secondary">Close</button>
+      </div>
+    </header>
+    <div class="content" id="modalContent">
+      <!-- dynamic content -->
+    </div>
+  </div>
+</div>
+
+<footer>
+  Tip: Use the "Add Chapter" button to register your chapter folder (e.g. <code>chapters/algebra/index.html</code>).
+</footer>
+
+<script>
+/*
+  SSC Maths Foundation Hub
+  - chapters saved in localStorage under key 'ssc_chapters'
+  - demo questions included for chapter demo
+  - features: add chapter, open link, chapter quiz modal (hints & guide), mock test, export/import
+*/
+
+/* ---------------------- Utilities ---------------------- */
+const el = q => document.querySelector(q);
+const elAll = q => Array.from(document.querySelectorAll(q));
+const uid = () => 'c_' + Math.random().toString(36).slice(2,9);
+
+/* ---------------------- Storage ---------------------- */
+const STORAGE_KEY = 'ssc_chapters_v1';
+const STATS_KEY = 'ssc_stats_v1';
+
+function loadChapters(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : seedChapters();
+  } catch(e){ return seedChapters(); }
+}
+function saveChapters(chapters){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(chapters));
+}
+function loadStats(){
+  try { return JSON.parse(localStorage.getItem(STATS_KEY) || '{}'); } catch(e){ return {}; }
+}
+function saveStats(stats){ localStorage.setItem(STATS_KEY, JSON.stringify(stats)); }
+
+/* ---------------------- Seed demo content ---------------------- */
+function seedChapters(){
+  const now = new Date().toISOString();
+  const seed = [
+    { id: uid(), name: 'Number Systems (Demo)', path: 'chapters/numbers/index.html', created: now, completed:false, score:null, lastAttempt:null },
+    { id: uid(), name: 'Algebra — Basic (Demo)', path: 'chapters/algebra/index.html', created: now, completed:false, score:null, lastAttempt:null }
+  ];
+  saveChapters(seed);
+  return seed;
+}
+
+/* ---------------------- UI Rendering ---------------------- */
+let chapters = loadChapters();
+let stats = loadStats();
+
+function renderAll(){
+  chapters = loadChapters();
+  stats = loadStats();
+  renderChapters();
+  renderStats();
+}
+
+function renderChapters(){
+  const grid = el('#chaptersGrid');
+  grid.innerHTML = '';
+  el('#chapterCount').textContent = chapters.length + (chapters.length === 1 ? ' chapter' : ' chapters');
+
+  chapters.forEach(ch => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h3>${escapeHtml(ch.name)}</h3>
+          <div class="meta">Path: <span class="tiny mono">${escapeHtml(ch.path)}</span></div>
+        </div>
+        <div style="text-align:right">
+          ${ch.completed ? `<div class="badge">Completed</div>` : `<div class="chip tiny">${ch.score ? ch.score + ' pts' : 'Not attempted'}</div>`}
+        </div>
+      </div>
+      <div class="progress" title="Progress"><span style="width:${ch.completed ? 100 : (ch.score ? Math.min(95,ch.score) : 6)}%"></span></div>
+      <div class="row" style="justify-content:space-between;align-items:center;margin-top:6px">
+        <div class="tiny">Last attempt: ${ch.lastAttempt ? new Date(ch.lastAttempt).toLocaleString() : '—'}</div>
+        <div class="tiny">Created: ${new Date(ch.created).toLocaleDateString()}</div>
+      </div>
+      <div class="actions" style="margin-top:12px">
+        <button class="btn secondary" data-open="${ch.id}">Open</button>
+        <button class="btn" data-quiz="${ch.id}">Quiz</button>
+        <button class="btn warn" data-reset="${ch.id}">Reset</button>
+        <button class="btn success" data-mark="${ch.id}">Mark Complete</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // attach handlers
+  grid.querySelectorAll('[data-open]').forEach(btn=>{
+    btn.onclick = (ev)=>{
+      const id = btn.getAttribute('data-open');
+      const chap = chapters.find(c=>c.id===id);
+      if(!chap){ alert('chapter not found'); return; }
+      // open path in a new tab; user must ensure path is valid relative to hub.
+      window.open(chap.path, '_blank');
+    }
+  });
+
+  grid.querySelectorAll('[data-quiz]').forEach(btn=>{
+    btn.onclick = ()=>{
+      openChapterQuiz(btn.getAttribute('data-quiz'));
+    }
+  });
+
+  grid.querySelectorAll('[data-reset]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const id = btn.getAttribute('data-reset');
+      if(!confirm('Reset attempts and completion for this chapter?')) return;
+      const ch = chapters.find(c=>c.id===id);
+      ch.completed=false; ch.score=null; ch.lastAttempt=null;
+      saveChapters(chapters); renderAll();
+    }
+  });
+
+  grid.querySelectorAll('[data-mark]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const id = btn.getAttribute('data-mark');
+      const ch = chapters.find(c=>c.id===id);
+      ch.completed = true;
+      ch.score = ch.score || 100;
+      ch.lastAttempt = new Date().toISOString();
+      saveChapters(chapters); renderAll();
+    }
+  });
+}
+
+function renderStats(){
+  const total = chapters.length;
+  const completed = chapters.filter(c=>c.completed).length;
+  const mocks = stats.mockAttempts || 0;
+  el('#statChapters').textContent = total;
+  el('#statCompleted').textContent = completed;
+  el('#statMocks').textContent = mocks;
+}
+
+/* ---------------------- Modal handling ---------------------- */
+const modal = el('#modalBackdrop');
+const modalTitle = el('#modalTitle');
+const modalContent = el('#modalContent');
+el('#modalClose').addEventListener('click', closeModal);
+modal.addEventListener('click', (e)=> { if(e.target === modal) closeModal(); });
+
+function openModal(title, innerHTML){
+  modalTitle.textContent = title;
+  modalContent.innerHTML = innerHTML;
+  modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden','false');
+}
+function closeModal(){
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden','true');
+}
+
+/* ---------------------- Add Chapter UI ---------------------- */
+el('#addChapterBtn').addEventListener('click', ()=>{
+  openModal('Register a Chapter', `
+    <form id="addChapterForm">
+      <label>Chapter name</label>
+      <input id="chapName" placeholder="E.g. Algebra — Polynomials" required />
+      <label>Path to chapter (relative)</label>
+      <input id="chapPath" placeholder="E.g. chapters/algebra/index.html" required />
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button type="submit" class="primary">Save chapter</button>
+        <button type="button" id="cancelAdd" class="btn secondary">Cancel</button>
+      </div>
+    </form>
+  `);
+  el('#cancelAdd').onclick = closeModal;
+  el('#addChapterForm').onsubmit = (ev)=>{
+    ev.preventDefault();
+    const name = el('#chapName').value.trim();
+    const path = el('#chapPath').value.trim();
+    if(!name || !path){ alert('Name and path required'); return; }
+    const newChap = { id: uid(), name, path, created: new Date().toISOString(), completed:false, score:null, lastAttempt:null };
+    chapters.push(newChap); saveChapters(chapters);
+    renderAll(); closeModal();
+  };
+});
+
+/* ---------------------- Chapter quiz flow ---------------------- */
+
+/* Demo question bank: each chapter id will map to these demo questions for the hub-run quiz.
+   You will expand these or replace them programmatically as you add real content. */
+const demoQuestions = {
+  // note: these questions are intentionally elementary demos. Replace when you have chapter-specific items.
+  'numbers': [
+    { q: 'Find the LCM of 12 and 18.', a: '36', hints:['List multiples of each number','LCM is the smallest common multiple'] , guide: 'Prime factorization: 12 = 2^2 * 3, 18 = 2 * 3^2 => LCM = 2^2 * 3^2 = 4 * 9 = 36.' },
+    { q: 'If x is an integer and 3x ≡ 1 (mod 4), what is x mod 4?', a: '3', hints:['Try x = 0..3','Compute 3*? modulo 4'], guide: '3*3 = 9 ≡ 1 (mod 4), so x ≡ 3.' }
+  ],
+  'algebra': [
+    { q: 'Solve x^2 - 5x + 6 = 0.', a: '2,3', hints:['Factorize the quadratic','Look for two numbers multiply 6 and add -5'], guide: 'Equation factors to (x-2)(x-3)=0 so x=2 or x=3.' },
+    { q: 'If 2x+3=11, find x.', a: '4', hints:['Subtract 3 then divide by 2'], guide: '2x=8 => x=4.' }
+  ]
+};
+
+/* Helper to find demo bank by chapter name or path keywords */
+function getDemoBankForChapter(chapter){
+  // try to match key by path or name
+  const name = (chapter.name || '').toLowerCase();
+  const path = (chapter.path || '').toLowerCase();
+  if(path.includes('number') || name.includes('number')) return demoQuestions.numbers;
+  if(path.includes('algebra') || name.includes('algebra')) return demoQuestions.algebra;
+  // fallback combine both banks
+  return [...(demoQuestions.numbers||[]), ...(demoQuestions.algebra||[])].slice(0,4);
+}
+
+/* Build quiz UI for a chapter (in modal) */
+function openChapterQuiz(chId){
+  const chap = chapters.find(c=>c.id===chId);
+  if(!chap){ alert('Chapter not found'); return; }
+  const bank = getDemoBankForChapter(chap);
+
+  // create form with questions
+  let html = `<div><p class="muted">Quiz for <strong>${escapeHtml(chap.name)}</strong>. Hints are available per question. Scoring: correct answers award points. Complete all to mark chapter completed.</p></div><form id="chapterQuizForm">`;
+  bank.forEach((item, idx)=>{
+    html += `
+      <fieldset style="margin-top:12px;border:1px dashed #eef2ff;padding:10px;border-radius:8px">
+        <legend><strong>Q${idx+1}</strong></legend>
+        <div style="margin-bottom:8px">${escapeHtml(item.q)}</div>
+        <label class="tiny">Your answer</label>
+        <input class="quizAnswer" data-idx="${idx}" placeholder="Type answer (case-insensitive). For multiple answers separate by comma" />
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button type="button" class="btn secondary hintBtn" data-idx="${idx}">Show Hint</button>
+          <button type="button" class="btn" data-guide="${idx}">Show Guide</button>
+        </div>
+        <div class="tiny muted" id="hint_${idx}" style="display:none;margin-top:8px"></div>
+        <div class="tiny" id="guide_${idx}" style="display:none;margin-top:8px"></div>
+      </fieldset>
+    `;
+  });
+  html += `<div style="display:flex;gap:8px;margin-top:12px"><button class="primary" type="submit">Submit Quiz</button><button type="button" id="cancelQuiz" class="btn secondary">Cancel</button></div></form>`;
+  openModal('Chapter Quiz — ' + chap.name, html);
+
+  // attach hint and guide handlers
+  modalContent.querySelectorAll('.hintBtn').forEach(btn=>{
+    btn.onclick = ()=> {
+      const i = +btn.getAttribute('data-idx');
+      const hintBox = el('#hint_'+i);
+      hintBox.textContent = (bank[i].hints || []).join(' — ');
+      hintBox.style.display = hintBox.textContent ? 'block' : 'none';
+    }
+  });
+  modalContent.querySelectorAll('[data-guide]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const i = +btn.getAttribute('data-guide');
+      const guideBox = el('#guide_'+i);
+      guideBox.innerHTML = bank[i].guide ? `<div class="hint">${escapeHtml(bank[i].guide)}</div>` : '<div class="tiny muted">No guide available.</div>';
+      guideBox.style.display = 'block';
+    }
+  });
+
+  el('#cancelQuiz').onclick = closeModal;
+
+  el('#chapterQuizForm').onsubmit = (ev)=>{
+    ev.preventDefault();
+    // score
+    let total = bank.length;
+    let correct = 0;
+    const answers = modalContent.querySelectorAll('.quizAnswer');
+    answers.forEach(input=>{
+      const idx = +input.getAttribute('data-idx');
+      const user = (input.value || '').trim().toLowerCase();
+      if(!user) return;
+      const correctAns = (bank[idx].a || '').toString().toLowerCase();
+      // accept comma-separated for multiple correct answers
+      const uParts = user.split(/\s*,\s*/).map(s=>s.replace(/\s+/g,''));
+      const cParts = correctAns.split(/\s*,\s*/).map(s=>s.replace(/\s+/g,''));
+      // simple equality or set equality
+      const matched = arraysEqualIgnoringOrder(uParts, cParts) || uParts.includes(correctAns) || cParts.includes(user);
+      if(matched) correct++;
+    });
+    const score = Math.round((correct/total) * 100);
+    // store attempt
+    chap.score = score;
+    chap.lastAttempt = new Date().toISOString();
+    if(score >= 60) chap.completed = true; // threshold for auto-complete
+    saveChapters(chapters);
+
+    // feedback
+    const msg = `<div><h4>Result: ${score} / 100</h4><p class="muted">You answered ${correct} out of ${total} questions correctly. ${score >= 60 ? '<strong>Chapter marked complete.</strong>' : '<strong>Score below 60%. Try again.</strong>'}</p></div>`;
+    openModal('Quiz Results — ' + chap.name, msg + `<div style="margin-top:12px"><button id="closeResults" class="primary">Close</button></div>`);
+    el('#closeResults').onclick = ()=>{ closeModal(); renderAll(); };
+  };
+}
+
+/* ---------------------- Mock test ---------------------- */
+el('#openMock').addEventListener('click', ()=>{
+  // collect banks for all chapters
+  let pool = [];
+  chapters.forEach(ch=>{
+    const bank = getDemoBankForChapter(ch);
+    pool.push(...bank);
+  });
+  if(pool.length === 0){ alert('No questions available. Add chapters or demo banks.'); return; }
+  // shuffle and pick up to 10
+  shuffleArray(pool);
+  const selected = pool.slice(0, Math.min(10,pool.length));
+  openMockTest(selected);
+});
+
+function openMockTest(questions){
+  // create UI similar to chapter quiz but with timer and review
+  let html = `<div><p class="muted">Mock test — ${questions.length} questions. No negative marking. Hints disabled during mock to simulate test conditions. Use guide after finishing for solutions.</p></div><form id="mockForm">`;
+  questions.forEach((q, i)=>{
+    html += `
+      <fieldset style="margin-top:12px;border:1px dashed #eef2ff;padding:10px;border-radius:8px">
+        <legend><strong>Q${i+1}</strong></legend>
+        <div style="margin-bottom:8px">${escapeHtml(q.q)}</div>
+        <label class="tiny">Your answer</label>
+        <input class="mockAnswer" data-idx="${i}" placeholder="Type answer" />
+        <div class="tiny muted" id="mockGuide_${i}" style="display:none;margin-top:8px"></div>
+      </fieldset>
+    `;
+  });
+  html += `
+    <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+      <button class="primary" type="submit">Submit Mock</button>
+      <button type="button" id="cancelMock" class="btn secondary">Cancel</button>
+      <div style="margin-left:auto;text-align:right">
+        <div class="tiny muted">Timer: <span id="mockTimer">15:00</span></div>
+      </div>
+    </div>
+  </form>`;
+  openModal('Mock Test', html);
+
+  // Timer 15 minutes
+  let seconds = 15*60;
+  const timerEl = el('#mockTimer');
+  const timerInterval = setInterval(()=>{
+    seconds--;
+    if(seconds < 0){ clearInterval(timerInterval); finishMock(); return; }
+    timerEl.textContent = formatTime(seconds);
+  },1000);
+
+  el('#cancelMock').onclick = ()=>{
+    clearInterval(timerInterval); closeModal();
+  };
+
+  function finishMock(){
+    // auto submit
+    if(el('#mockForm')) el('#mockForm').dispatchEvent(new Event('submit',{cancelable:true}));
+  }
+
+  el('#mockForm').onsubmit = (ev)=>{
+    ev.preventDefault();
+    clearInterval(timerInterval);
+    let correct = 0;
+    const answers = modalContent.querySelectorAll('.mockAnswer');
+    answers.forEach(input=>{
+      const idx = +input.getAttribute('data-idx');
+      const user = (input.value || '').trim().toLowerCase();
+      if(!user) return;
+      const correctAns = (questions[idx].a || '').toString().toLowerCase();
+      const uParts = user.split(/\s*,\s*/).map(s=>s.replace(/\s+/g,''));
+      const cParts = correctAns.split(/\s*,\s*/).map(s=>s.replace(/\s+/g,''));
+      const matched = arraysEqualIgnoringOrder(uParts, cParts) || uParts.includes(correctAns) || cParts.includes(user);
+      if(matched) correct++;
+      // reveal guide for each
+      const guideBox = el('#mockGuide_'+idx);
+      guideBox.innerHTML = questions[idx].guide ? `<div class="hint">${escapeHtml(questions[idx].guide)}</div>` : '<div class="tiny muted">No guide available.</div>';
+      guideBox.style.display = 'block';
+    });
+    const score = Math.round((correct/questions.length) * 100);
+    // persist mock attempt count
+    stats.mockAttempts = (stats.mockAttempts || 0) + 1;
+    saveStats(stats);
+
+    const summary = `<div><h4>Mock score: ${score} / 100</h4><p class="muted">Correct: ${correct} / ${questions.length}</p></div>`;
+    openModal('Mock Results', summary + `<div style="margin-top:12px"><button id="closeMockResults" class="primary">Close</button></div>`);
+    el('#closeMockResults').onclick = ()=>{ closeModal(); renderAll(); };
+  };
+}
+
+/* ---------------------- Export / Import ---------------------- */
+el('#exportBtn').addEventListener('click', ()=>{
+  const payload = { chapters: chapters, stats: stats, exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'ssc_maths_progress.json'; document.body.appendChild(a); a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+});
+
+el('#importBtn').addEventListener('click', ()=>{
+  openModal('Import progress', `<div><p class="muted">Paste JSON exported from this hub or upload file.</p><textarea id="importArea" style="width:100%;height:160px"></textarea><div style="display:flex;gap:8px;margin-top:8px"><button id="doImport" class="primary">Import</button><button id="cancelImport" class="btn secondary">Cancel</button></div></div>`);
+  el('#cancelImport').onclick = closeModal;
+  el('#doImport').onclick = ()=>{
+    try{
+      const txt = el('#importArea').value.trim();
+      if(!txt) { alert('Paste JSON first'); return; }
+      const parsed = JSON.parse(txt);
+      if(parsed.chapters) { chapters = parsed.chapters; saveChapters(chapters); }
+      if(parsed.stats) { stats = parsed.stats; saveStats(stats); }
+      renderAll(); closeModal(); alert('Import complete');
+    } catch(e){ alert('Invalid JSON: ' + e.message); }
+  };
+});
+
+/* ---------------------- Helpers ---------------------- */
+function escapeHtml(s){
+  if(!s) return '';
+  return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]) });
+}
+function arraysEqualIgnoringOrder(a,b){
+  if(!Array.isArray(a) || !Array.isArray(b)) return false;
+  const A = a.slice().map(s=>s.toString()).sort();
+  const B = b.slice().map(s=>s.toString()).sort();
+  if(A.length !== B.length) return false;
+  for(let i=0;i<A.length;i++) if(A[i] !== B[i]) return false;
+  return true;
+}
+function shuffleArray(a){
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+}
+function formatTime(secs){
+  const m = Math.floor(secs/60).toString().padStart(2,'0');
+  const s = (secs%60).toString().padStart(2,'0');
+  return m+':'+s;
+}
+
+/* ---------------------- Small initial wiring ---------------------- */
+/* If user hasn't created their own chapters, show seed cards with demo badges. Allow editing by resetting in UI. */
+(function init(){
+  // ensure chapters array shaped correctly
+  chapters = loadChapters();
+  if(!chapters || !Array.isArray(chapters)) chapters = seedChapters();
+  renderAll();
+})();
+
+</script>
+</body>
+</html>
