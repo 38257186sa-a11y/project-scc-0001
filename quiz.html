@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SSC Maths Prep - Algebra</title>
+  <title>Quiz</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,8 +12,8 @@
       padding: 20px;
     }
     h1 {
-      color: #2c3e50;
       text-align: center;
+      color: #2c3e50;
     }
     .quiz-container {
       max-width: 700px;
@@ -72,8 +72,8 @@
   </style>
 </head>
 <body>
-  <h1>SSC Maths Preparation - Algebra</h1>
-  <div class="quiz-container">
+  <h1 id="chapter-title">Quiz</h1>
+  <div class="quiz-container" id="quiz-container">
     <div class="question" id="question"></div>
     <div class="options" id="options"></div>
     <div class="hint" id="hint"></div>
@@ -89,12 +89,22 @@
     let current = 0;
     let score = 0;
 
+    // Get chapter from URL (e.g., quiz.html?chapter=algebra.json)
+    const urlParams = new URLSearchParams(window.location.search);
+    const chapterFile = urlParams.get('chapter') || 'algebra.json';
+
+    // Set title
+    document.getElementById("chapter-title").innerText = "Chapter: " + chapterFile.replace(".json","");
+
     // Load JSON file
-    fetch('algebra.json')
+    fetch("chapters/" + chapterFile)
       .then(response => response.json())
       .then(data => {
         questions = data;
         loadQuestion();
+      })
+      .catch(err => {
+        document.getElementById("quiz-container").innerHTML = "<p>❌ Error loading questions.</p>";
       });
 
     function loadQuestion() {
@@ -111,8 +121,9 @@
         });
       } else {
         document.getElementById('quiz-container').innerHTML = `
-          <h2>Test Completed!</h2>
+          <h2>🎉 Test Completed!</h2>
           <p>Your Final Score: ${score}/${questions.length}</p>
+          <a href="index.html">⬅ Back to Chapters</a>
         `;
       }
     }
