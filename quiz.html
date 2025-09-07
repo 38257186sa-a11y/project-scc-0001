@@ -21,7 +21,7 @@
     .options button:hover { background: #dcdde1; }
     .options button.correct { background: #2ecc71; color: white; }
     .options button.wrong { background: #e74c3c; color: white; }
-    .hint {
+    .hint, .solution {
       margin-top: 10px; padding: 10px;
       background: #f9f9f9; border-left: 4px solid #3498db; display: none;
     }
@@ -36,6 +36,8 @@
     .score { text-align: center; margin-top: 15px; font-weight: bold; }
     .report { text-align: left; margin-top: 20px; }
     .report-item { margin-bottom: 15px; padding: 10px; border-radius: 6px; background: #f6f6f6; }
+    .correct-answer { color: green; font-weight: bold; }
+    .wrong-answer { color: red; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -44,14 +46,14 @@
     <div class="timer" id="timer">⏳ Time: 30s</div>
     <div class="question" id="question"></div>
     <div class="options" id="options"></div>
-    <div class="hint" id="hint"></div>
+    <div class="solution" id="solution"></div>
     <div class="controls">
-      <button onclick="showHint()">Show Hint</button>
       <button onclick="submitQuiz()">Submit Quiz</button>
     </div>
     <div class="score" id="score"></div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     let questions = [];
     let current = 0;
@@ -74,11 +76,11 @@
         const q = questions[current];
         document.getElementById('question').innerText = (current+1) + ". " + q.question;
         document.getElementById('options').innerHTML = '';
-        document.getElementById('hint').style.display = 'none';
+        document.getElementById('solution').style.display = 'none';
         q.options.forEach(opt => {
           const btn = document.createElement('button');
           btn.innerText = opt;
-          btn.onclick = () => checkAnswer(btn, opt);
+          btn.onclick = () => checkAnswer(btn, opt, q.solution);
           document.getElementById('options').appendChild(btn);
         });
         startTimer();
@@ -102,7 +104,7 @@
       }, 1000);
     }
 
-    function checkAnswer(button, selected) {
+    function checkAnswer(button, selected, solutionText) {
       const correct = questions[current].answer;
       const btns = document.querySelectorAll(".options button");
       btns.forEach(b => b.disabled = true); // one attempt only
@@ -113,30 +115,52 @@
         button.classList.add("wrong");
         btns.forEach(b => { if (b.innerText === correct) b.classList.add("correct"); });
       }
-      answers.push({q: questions[current].question, selected, correct});
+      answers.push({q: questions[current].question, selected, correct, solution: solutionText});
       document.getElementById('score').innerText = "Score: " + score;
-      clearInterval(timerInterval);
-      setTimeout(() => { current++; loadQuestion(); }, 1500);
-    }
 
-    function showHint() {
-      document.getElementById('hint').innerText = "💡 " + questions[current].hint;
-      document.getElementById('hint').style.display = 'block';
+      // Show solution/explanation
+      document.getElementById('solution').innerText = "📝 Solution: " + solutionText;
+      document.getElementById('solution').style.display = 'block';
+
+      clearInterval(timerInterval);
+      setTimeout(() => { current++; loadQuestion(); }, 3000); // 3s delay to next
     }
 
     function submitQuiz() {
       clearInterval(timerInterval);
       let reportHTML = `<h2>📊 Quiz Report</h2><p>Your Score: ${score}/${questions.length}</p>`;
       answers.forEach((a, i) => {
+        let status = a.selected === a.correct ? 
+          `<span class="correct-answer">✅ Correct</span>` : 
+          `<span class="wrong-answer">❌ Wrong</span>`;
         reportHTML += `
           <div class="report-item">
             <b>Q${i+1}: ${a.q}</b><br>
             Your Answer: ${a.selected}<br>
-            Correct Answer: ${a.correct}
+            Correct Answer: ${a.correct}<br>
+            ${status}<br>
+            <i>Solution: ${a.solution}</i>
           </div>
         `;
       });
-      document.getElementById('quiz-container').innerHTML = reportHTML + `<a href="index.html">⬅ Back to Chapters</a>`;
+      reportHTML += `<button onclick="downloadPDF()">⬇ Download PDF</button><br><a href="index.html">⬅ Back to Chapters</a>`;
+      document.getElementById('quiz-container').innerHTML = reportHTML;
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(14);
+      doc.text("SSC Quiz Report", 10, 10);
+      let y = 20;
+      answers.forEach((a, i) => {
+        doc.text(`Q${i+1}: ${a.q}`, 10, y); y+=6;
+        doc.text(`Your Answer: ${a.selected}`, 10, y); y+=6;
+        doc.text(`Correct Answer: ${a.correct}`, 10, y); y+=6;
+        doc.text(`Solution: ${a.solution}`, 10, y); y+=10;
+        if (y > 270) { doc.addPage(); y=20; }
+      });
+      doc.save("quiz-report.pdf");
     }
   </script>
 </body>
