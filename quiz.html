@@ -3,14 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SSC Quiz</title>
+  <title>SSC Maths Quiz</title>
   <style>
     body { font-family: Arial, sans-serif; background: #eef2f7; margin: 0; padding: 20px; }
     h1 { text-align: center; color: #2c3e50; }
+    .chapter-list, .set-list { text-align: center; margin: 20px 0; }
+    .btn {
+      display: inline-block; margin: 8px; padding: 12px 25px;
+      border: none; border-radius: 8px;
+      background: #27ae60; color: white; font-size: 16px;
+      cursor: pointer; text-decoration: none; transition: background 0.3s;
+    }
+    .btn:hover { background: #1e8449; }
     .quiz-container {
       max-width: 750px; margin: auto; background: white;
       padding: 20px; border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1); display:none;
     }
     .question { font-size: 18px; margin-bottom: 15px; }
     .options button {
@@ -34,7 +42,27 @@
   </style>
 </head>
 <body>
-  <h1 id="chapter-title">Quiz</h1>
+  <h1>SSC Maths Quiz</h1>
+
+  <!-- Chapter selection -->
+  <div class="chapter-list" id="chapter-list">
+    <h2>Select a Chapter</h2>
+    <button class="btn" onclick="showSets('Algebra')">Algebra</button>
+    <button class="btn" onclick="showSets('Geometry')">Geometry</button>
+    <button class="btn" onclick="showSets('Trigonometry')">Trigonometry</button>
+    <button class="btn" onclick="showSets('Arithmetic')">Arithmetic</button>
+    <button class="btn" onclick="showSets('Mensuration')">Mensuration</button>
+    <button class="btn" onclick="showSets('Statistics')">Statistics</button>
+  </div>
+
+  <!-- Set selection -->
+  <div class="set-list" id="set-list" style="display:none;">
+    <h2 id="set-title">Select a Set</h2>
+    <div id="sets"></div>
+    <button class="btn" onclick="backToChapters()">⬅ Back</button>
+  </div>
+
+  <!-- Quiz -->
   <div class="quiz-container" id="quiz-container">
     <div class="timer" id="timer">⏳ Time: 30s</div>
     <div class="question" id="question"></div>
@@ -46,9 +74,63 @@
     <div class="score" id="score"></div>
   </div>
 
-  <!-- jsPDF for PDF report -->
+  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
+    // 📚 Question Bank
+    const questionBank = {
+      "Algebra": {
+        "Set 1": [
+          { question: "Solve: 2x + 3 = 11",
+            options: ["x=3", "x=4", "x=5", "x=6"],
+            answer: "x=4",
+            solution: "Formula: Solve linear equations → 2x+3=11 → 2x=8 → x=4" }
+        ]
+      },
+      "Geometry": {
+        "Set 1": [
+          { question: "Find area of a triangle with base=6, height=4",
+            options: ["12", "10", "14", "8"],
+            answer: "12",
+            solution: "Formula: Area = ½ × base × height = ½ × 6 × 4 = 12" }
+        ]
+      },
+      "Trigonometry": {
+        "Set 1": [
+          { question: "Value of sin²30° + cos²30° ?",
+            options: ["1", "0", "½", "√3/2"],
+            answer: "1",
+            solution: "Formula: sin²θ + cos²θ = 1 (Identity)" }
+        ]
+      },
+      "Arithmetic": {
+        "Set 1": [
+          { question: "Find Simple Interest: P=1000, R=5%, T=2 years",
+            options: ["100", "120", "110", "105"],
+            answer: "100",
+            solution: "Formula: SI = (P×R×T)/100 = (1000×5×2)/100 = 100" }
+        ]
+      },
+      "Mensuration": {
+        "Set 1": [
+          { question: "Volume of a cube with side=3 cm?",
+            options: ["9", "27", "18", "36"],
+            answer: "27",
+            solution: "Formula: V = a³ = 3³ = 27 cm³" }
+        ]
+      },
+      "Statistics": {
+        "Set 1": [
+          { question: "Mean of 2, 4, 6, 8?",
+            options: ["4", "5", "6", "7"],
+            answer: "5",
+            solution: "Formula: Mean = (Σx)/n = (20)/4 = 5" }
+        ]
+      }
+    };
+
+    // ⚙️ State
+    let currentChapter = "";
     let questions = [];
     let current = 0;
     let score = 0;
@@ -56,28 +138,32 @@
     let timerInterval;
     let timeLeft = 30;
 
-    // get chapter file from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const chapterFile = urlParams.get('chapter') || 'algebra-set1.json';
-    document.getElementById("chapter-title").innerText = "Chapter: " + chapterFile.replace(".json","");
+    function showSets(chapter) {
+      currentChapter = chapter;
+      document.getElementById("chapter-list").style.display = "none";
+      document.getElementById("set-list").style.display = "block";
+      document.getElementById("set-title").innerText = "Select a Set for " + chapter;
+      let setButtons = "";
+      for (let set in questionBank[chapter]) {
+        setButtons += `<button class="btn" onclick="startQuiz('${chapter}','${set}')">${set}</button>`;
+      }
+      document.getElementById("sets").innerHTML = setButtons;
+    }
 
-    // ✅ fixed fetch with clear error display
-    fetch("chapters/" + chapterFile)
-      .then(response => {
-        if (!response.ok) throw new Error("HTTP error " + response.status);
-        return response.json();
-      })
-      .then(data => {
-        if (!Array.isArray(data)) throw new Error("Invalid JSON format: expected an array");
-        questions = data;
-        loadQuestion();
-      })
-      .catch(err => {
-        document.getElementById("quiz-container").innerHTML =
-          "<p style='color:red; font-weight:bold'>❌ Error loading quiz file: " 
-          + chapterFile + "<br>" + err.message + "</p>";
-        console.error("Quiz Load Error:", err);
-      });
+    function backToChapters() {
+      document.getElementById("set-list").style.display = "none";
+      document.getElementById("chapter-list").style.display = "block";
+    }
+
+    function startQuiz(chapter, set) {
+      questions = questionBank[chapter][set];
+      current = 0;
+      score = 0;
+      answers = [];
+      document.getElementById("set-list").style.display = "none";
+      document.getElementById("quiz-container").style.display = "block";
+      loadQuestion();
+    }
 
     function loadQuestion() {
       if (current < questions.length) {
@@ -125,7 +211,7 @@
       }
       answers.push({q: questions[current].question, selected, correct, solution: solutionText});
       document.getElementById('score').innerText = "Score: " + score;
-      document.getElementById('solution').innerText = "📝 Solution: " + solutionText;
+      document.getElementById('solution').innerText = "📝 " + solutionText;
       document.getElementById('solution').style.display = 'block';
       clearInterval(timerInterval);
       setTimeout(() => { current++; loadQuestion(); }, 3000);
@@ -144,11 +230,11 @@
             Your Answer: ${a.selected}<br>
             Correct Answer: ${a.correct}<br>
             ${status}<br>
-            <i>Solution: ${a.solution}</i>
+            <i>${a.solution}</i>
           </div>
         `;
       });
-      reportHTML += `<button onclick="downloadPDF()">⬇ Download PDF</button><br><a href="index.html">⬅ Back to Chapters</a>`;
+      reportHTML += `<button onclick="downloadPDF()">⬇ Download PDF</button><br><button onclick="location.reload()">⬅ Back to Chapters</button>`;
       document.getElementById('quiz-container').innerHTML = reportHTML;
     }
 
