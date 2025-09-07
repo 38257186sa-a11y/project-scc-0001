@@ -56,14 +56,22 @@
     let timerInterval;
     let timeLeft = 30;
 
+    // get chapter file from URL
     const urlParams = new URLSearchParams(window.location.search);
     const chapterFile = urlParams.get('chapter') || 'algebra-set1.json';
     document.getElementById("chapter-title").innerText = "Chapter: " + chapterFile.replace(".json","");
 
+    // fetch JSON with error handling
     fetch("chapters/" + chapterFile)
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) throw new Error("HTTP error " + response.status);
+        return response.json();
+      })
       .then(data => { questions = data; loadQuestion(); })
-      .catch(err => { document.getElementById("quiz-container").innerHTML = "<p>❌ Error loading questions.</p>"; });
+      .catch(err => {
+        document.getElementById("quiz-container").innerHTML =
+          "<p style='color:red'>❌ Error loading quiz: " + err.message + "</p>";
+      });
 
     function loadQuestion() {
       if (current < questions.length) {
@@ -99,4 +107,60 @@
     }
 
     function checkAnswer(button, selected, solutionText) {
-      const correct = questions[c]()
+      const correct = questions[current].answer;
+      const btns = document.querySelectorAll(".options button");
+      btns.forEach(b => b.disabled = true); // lock
+      if (selected === correct) {
+        score++;
+        button.classList.add("correct");
+      } else {
+        button.classList.add("wrong");
+        btns.forEach(b => { if (b.innerText === correct) b.classList.add("correct"); });
+      }
+      answers.push({q: questions[current].question, selected, correct, solution: solutionText});
+      document.getElementById('score').innerText = "Score: " + score;
+      document.getElementById('solution').innerText = "📝 Solution: " + solutionText;
+      document.getElementById('solution').style.display = 'block';
+      clearInterval(timerInterval);
+      setTimeout(() => { current++; loadQuestion(); }, 3000);
+    }
+
+    function submitQuiz() {
+      clearInterval(timerInterval);
+      let reportHTML = `<h2>📊 Quiz Report</h2><p>Your Score: ${score}/${questions.length}</p>`;
+      answers.forEach((a, i) => {
+        let status = a.selected === a.correct ?
+          `<span class="correct-answer">✅ Correct</span>` :
+          `<span class="wrong-answer">❌ Wrong</span>`;
+        reportHTML += `
+          <div class="report-item">
+            <b>Q${i+1}: ${a.q}</b><br>
+            Your Answer: ${a.selected}<br>
+            Correct Answer: ${a.correct}<br>
+            ${status}<br>
+            <i>Solution: ${a.solution}</i>
+          </div>
+        `;
+      });
+      reportHTML += `<button onclick="downloadPDF()">⬇ Download PDF</button><br><a href="index.html">⬅ Back to Chapters</a>`;
+      document.getElementById('quiz-container').innerHTML = reportHTML;
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(14);
+      doc.text("SSC Quiz Report", 10, 10);
+      let y = 20;
+      answers.forEach((a, i) => {
+        doc.text(`Q${i+1}: ${a.q}`, 10, y); y+=6;
+        doc.text(`Your Answer: ${a.selected}`, 10, y); y+=6;
+        doc.text(`Correct Answer: ${a.correct}`, 10, y); y+=6;
+        doc.text(`Solution: ${a.solution}`, 10, y); y+=10;
+        if (y > 270) { doc.addPage(); y=20; }
+      });
+      doc.save("quiz-report.pdf");
+    }
+  </script>
+</body>
+</html>
