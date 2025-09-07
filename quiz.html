@@ -5,81 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Quiz</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6fb;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      color: #2c3e50;
-    }
+    body { font-family: Arial, sans-serif; background: #eef2f7; margin: 0; padding: 20px; }
+    h1 { text-align: center; color: #2c3e50; }
     .quiz-container {
-      max-width: 700px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
+      max-width: 750px; margin: auto; background: white;
+      padding: 20px; border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    .question {
-      font-size: 18px;
-      margin-bottom: 15px;
-    }
+    .question { font-size: 18px; margin-bottom: 15px; }
     .options button {
-      display: block;
-      width: 100%;
-      margin: 8px 0;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      background: #ecf0f1;
-      cursor: pointer;
-      transition: background 0.3s;
+      display: block; width: 100%; margin: 8px 0; padding: 10px;
+      border: none; border-radius: 8px; background: #ecf0f1;
+      cursor: pointer; transition: background 0.3s;
     }
-    .options button:hover {
-      background: #dcdde1;
-    }
+    .options button:hover { background: #dcdde1; }
+    .options button.correct { background: #2ecc71; color: white; }
+    .options button.wrong { background: #e74c3c; color: white; }
     .hint {
-      margin-top: 10px;
-      padding: 10px;
-      background: #f9f9f9;
-      border-left: 4px solid #3498db;
-      display: none;
+      margin-top: 10px; padding: 10px;
+      background: #f9f9f9; border-left: 4px solid #3498db; display: none;
     }
-    .controls {
-      margin-top: 20px;
-      text-align: center;
-    }
+    .timer { font-weight: bold; color: #e74c3c; text-align: right; }
+    .controls { margin-top: 20px; text-align: center; }
     .controls button {
-      margin: 5px;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      background: #3498db;
-      color: white;
-      cursor: pointer;
+      margin: 5px; padding: 10px 20px;
+      border: none; border-radius: 8px;
+      background: #3498db; color: white; cursor: pointer;
     }
-    .controls button:hover {
-      background: #2980b9;
-    }
-    .score {
-      text-align: center;
-      margin-top: 15px;
-      font-weight: bold;
-    }
+    .controls button:hover { background: #2980b9; }
+    .score { text-align: center; margin-top: 15px; font-weight: bold; }
+    .report { text-align: left; margin-top: 20px; }
+    .report-item { margin-bottom: 15px; padding: 10px; border-radius: 6px; background: #f6f6f6; }
   </style>
 </head>
 <body>
   <h1 id="chapter-title">Quiz</h1>
   <div class="quiz-container" id="quiz-container">
+    <div class="timer" id="timer">⏳ Time: 30s</div>
     <div class="question" id="question"></div>
     <div class="options" id="options"></div>
     <div class="hint" id="hint"></div>
     <div class="controls">
       <button onclick="showHint()">Show Hint</button>
-      <button onclick="nextQuestion()">Next</button>
+      <button onclick="submitQuiz()">Submit Quiz</button>
     </div>
     <div class="score" id="score"></div>
   </div>
@@ -88,24 +56,18 @@
     let questions = [];
     let current = 0;
     let score = 0;
+    let answers = [];
+    let timerInterval;
+    let timeLeft = 30;
 
-    // Get chapter from URL (e.g., quiz.html?chapter=algebra.json)
     const urlParams = new URLSearchParams(window.location.search);
-    const chapterFile = urlParams.get('chapter') || 'algebra.json';
-
-    // Set title
+    const chapterFile = urlParams.get('chapter') || 'algebra-set1.json';
     document.getElementById("chapter-title").innerText = "Chapter: " + chapterFile.replace(".json","");
 
-    // Load JSON file
     fetch("chapters/" + chapterFile)
       .then(response => response.json())
-      .then(data => {
-        questions = data;
-        loadQuestion();
-      })
-      .catch(err => {
-        document.getElementById("quiz-container").innerHTML = "<p>❌ Error loading questions.</p>";
-      });
+      .then(data => { questions = data; loadQuestion(); })
+      .catch(err => { document.getElementById("quiz-container").innerHTML = "<p>❌ Error loading questions.</p>"; });
 
     function loadQuestion() {
       if (current < questions.length) {
@@ -116,27 +78,45 @@
         q.options.forEach(opt => {
           const btn = document.createElement('button');
           btn.innerText = opt;
-          btn.onclick = () => checkAnswer(opt);
+          btn.onclick = () => checkAnswer(btn, opt);
           document.getElementById('options').appendChild(btn);
         });
+        startTimer();
       } else {
-        document.getElementById('quiz-container').innerHTML = `
-          <h2>🎉 Test Completed!</h2>
-          <p>Your Final Score: ${score}/${questions.length}</p>
-          <a href="index.html">⬅ Back to Chapters</a>
-        `;
+        submitQuiz();
       }
     }
 
-    function checkAnswer(selected) {
+    function startTimer() {
+      timeLeft = 30;
+      document.getElementById("timer").innerText = "⏳ Time: " + timeLeft + "s";
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").innerText = "⏳ Time: " + timeLeft + "s";
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          current++;
+          loadQuestion();
+        }
+      }, 1000);
+    }
+
+    function checkAnswer(button, selected) {
       const correct = questions[current].answer;
+      const btns = document.querySelectorAll(".options button");
+      btns.forEach(b => b.disabled = true); // one attempt only
       if (selected === correct) {
         score++;
-        alert("✅ Correct!");
+        button.classList.add("correct");
       } else {
-        alert("❌ Wrong! Correct answer is: " + correct);
+        button.classList.add("wrong");
+        btns.forEach(b => { if (b.innerText === correct) b.classList.add("correct"); });
       }
+      answers.push({q: questions[current].question, selected, correct});
       document.getElementById('score').innerText = "Score: " + score;
+      clearInterval(timerInterval);
+      setTimeout(() => { current++; loadQuestion(); }, 1500);
     }
 
     function showHint() {
@@ -144,9 +124,19 @@
       document.getElementById('hint').style.display = 'block';
     }
 
-    function nextQuestion() {
-      current++;
-      loadQuestion();
+    function submitQuiz() {
+      clearInterval(timerInterval);
+      let reportHTML = `<h2>📊 Quiz Report</h2><p>Your Score: ${score}/${questions.length}</p>`;
+      answers.forEach((a, i) => {
+        reportHTML += `
+          <div class="report-item">
+            <b>Q${i+1}: ${a.q}</b><br>
+            Your Answer: ${a.selected}<br>
+            Correct Answer: ${a.correct}
+          </div>
+        `;
+      });
+      document.getElementById('quiz-container').innerHTML = reportHTML + `<a href="index.html">⬅ Back to Chapters</a>`;
     }
   </script>
 </body>
